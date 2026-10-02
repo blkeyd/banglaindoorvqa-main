@@ -1,2 +1,0 @@
-﻿# Shared prompt construction functions
-
