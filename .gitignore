@@ -1,0 +1,55 @@
+﻿# Data
+data/
+dataset/
+datasets/
+raw_data/
+
+# Question / answer data
+*.json
+*.jsonl
+
+# Raw outputs
+outputs/
+raw_outputs/
+model_outputs/
+
+# Human evaluation
+human_checks/
+annotations/
+
+# Model weights
+weights/
+checkpoints/
+*.pt
+*.pth
+*.bin
+*.safetensors
+*.ckpt
+
+# Secrets
+.env
+.env.*
+*.key
+*.pem
+credentials/
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Local environments
+.venv/
+venv/
+env/
+
+# Temporary files
+tmp/
+temp/
+*.log
+
+# System files
+.DS_Store
+Thumbs.db
