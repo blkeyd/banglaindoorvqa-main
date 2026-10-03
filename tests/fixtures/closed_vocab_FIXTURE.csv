@@ -1,0 +1,20 @@
+kind,class_id,forms_bn,forms_en,note
+room,bedroom,শোবার ঘর|বেডরুম,bedroom,TEST FIXTURE not ASSET-10
+room,living_room,বসার ঘর|ড্রয়িং রুম,living room|drawing room,TEST FIXTURE not ASSET-10
+room,kitchen,রান্নাঘর|কিচেন,kitchen,TEST FIXTURE not ASSET-10
+room,bathroom,বাথরুম,bathroom,TEST FIXTURE not ASSET-10
+material,wood,কাঠ|পারটেক্স,wood|wooden|board,TEST FIXTURE not ASSET-10
+material,metal,ধাতু|স্টিল|লোহা|অ্যালুমিনিয়াম,metal|steel|iron|aluminium,TEST FIXTURE not ASSET-10
+material,glass,কাচ|কাঁচ|গ্লাস,glass,TEST FIXTURE not ASSET-10
+material,plastic,প্লাস্টিক,plastic,TEST FIXTURE not ASSET-10
+colour,white,সাদা,white,TEST FIXTURE not ASSET-10
+colour,black,কালো,black,TEST FIXTURE not ASSET-10
+colour,red,লাল,red,TEST FIXTURE not ASSET-10
+colour,green,সবুজ,green,TEST FIXTURE not ASSET-10
+colour,yellow,হলুদ,yellow,TEST FIXTURE not ASSET-10
+number,1,এক|একটি|একটা,one,TEST FIXTURE not ASSET-10
+number,2,দুই|দুইটি|দুটি|দুটো,two,TEST FIXTURE not ASSET-10
+number,3,তিন,three,TEST FIXTURE not ASSET-10
+number,4,চার,four,TEST FIXTURE not ASSET-10
+number,5,পাঁচ,five,TEST FIXTURE not ASSET-10
+number,6,ছয়,six,TEST FIXTURE not ASSET-10

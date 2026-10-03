@@ -1,0 +1,29 @@
+name_id,name_bn,variants_bn,canonical_en,variants_en,super_bn,super_en,cluster_id,siblings,room_scope,cultural_specificity,origin3,origin_note,en_route,en_unique,freq_obj_name
+FX01,বালতি,,bucket,pail,পাত্র,container,,,bathroom,fixture,uncertain,TEST FIXTURE not lexicon data,no,yes,1
+FX02,ফ্রিজ,,fridge,refrigerator,,,,,kitchen,fixture,uncertain,TEST FIXTURE not lexicon data,yes,yes,1
+FX03,সোফা,,sofa,,আসবাব,furniture,,,living room,fixture,uncertain,TEST FIXTURE not lexicon data,yes,yes,1
+FX04,টেলিভিশন,টিভি,television,tv,,,,,living room,fixture,uncertain,TEST FIXTURE not lexicon data,yes,yes,1
+FX05,এসি,,air conditioner,ac,,,,,any,fixture,uncertain,TEST FIXTURE not lexicon data,yes,yes,1
+FX06,হাঁড়ি,,pot,,পাত্র,container,FXC1,পাতিল|দেকচি,kitchen,fixture,uncertain,TEST FIXTURE not lexicon data,no,no,1
+FX07,পাতিল,,pot,,পাত্র,container,FXC1,হাঁড়ি|দেকচি,kitchen,fixture,uncertain,TEST FIXTURE not lexicon data,no,no,1
+FX08,দেকচি,,pot,,পাত্র,container,FXC1,হাঁড়ি|পাতিল,kitchen,fixture,uncertain,TEST FIXTURE not lexicon data,no,no,1
+FX09,টেবিল,,table,,আসবাব,furniture,FXC2,পড়ার টেবিল,any,fixture,uncertain,TEST FIXTURE not lexicon data,yes,yes,1
+FX10,পড়ার টেবিল,,study table,reading table,টেবিল|আসবাব,table|furniture,FXC2,টেবিল,bedroom,fixture,uncertain,TEST FIXTURE not lexicon data,no,yes,1
+FX11,আলমারি,,almirah,wardrobe,আসবাব,furniture,FXC3,ওয়ারড্রব|শোকেস|ওয়াল শোকেস,bedroom,fixture,uncertain,TEST FIXTURE not lexicon data,no,no,1
+FX12,ওয়ারড্রব,,wardrobe,,আসবাব,furniture,FXC3,আলমারি|শোকেস|ওয়াল শোকেস,bedroom,fixture,uncertain,TEST FIXTURE not lexicon data,yes,no,1
+FX13,শোকেস,,showcase,,আসবাব,furniture,FXC3,আলমারি|ওয়ারড্রব|ওয়াল শোকেস,living room,fixture,uncertain,TEST FIXTURE not lexicon data,yes,yes,1
+FX14,ওয়াল শোকেস,,wall showcase,,শোকেস|আসবাব,showcase|furniture,FXC3,আলমারি|ওয়ারড্রব|শোকেস,living room,fixture,uncertain,TEST FIXTURE not lexicon data,yes,yes,1
+FX15,বালিশ,,pillow,,,,,,bedroom,fixture,uncertain,TEST FIXTURE not lexicon data,no,yes,1
+FX16,পর্দা,,curtain,,,,,,any,fixture,uncertain,TEST FIXTURE not lexicon data,no,yes,1
+FX17,দরজা,,door,,,,,,any,fixture,uncertain,TEST FIXTURE not lexicon data,no,yes,1
+FX18,আয়না,,mirror,,,,,,any,fixture,uncertain,TEST FIXTURE not lexicon data,no,yes,1
+FX19,জানালা,,window,,,,,,any,fixture,uncertain,TEST FIXTURE not lexicon data,no,yes,1
+FX20,চেয়ার,,chair,,আসবাব,furniture,,,any,fixture,uncertain,TEST FIXTURE not lexicon data,yes,yes,1
+FX21,টুল,,stool,,আসবাব,furniture,,,any,fixture,uncertain,TEST FIXTURE not lexicon data,no,no,1
+FX22,মোড়া,,stool,,আসবাব,furniture,,,any,fixture,uncertain,TEST FIXTURE not lexicon data,no,no,1
+FX23,ছুরি,,knife,,,,,,kitchen,fixture,uncertain,TEST FIXTURE not lexicon data,no,no,1
+FX24,চাকু,,knife,,,,,,kitchen,fixture,uncertain,TEST FIXTURE not lexicon data,no,no,1
+FX25,কমোড,,commode,,,,,,bathroom,fixture,uncertain,TEST FIXTURE not lexicon data,yes,yes,1
+FX26,গ্যাসের চুলা,,gas stove,,চুলা,stove,,,kitchen,fixture,uncertain,TEST FIXTURE not lexicon data,no,yes,1
+FX27,সুইচ বোর্ড,,switch board,,,,,,any,fixture,uncertain,TEST FIXTURE not lexicon data,yes,yes,1
+FX28,ল্যাপটপ,,laptop,,,,,,any,fixture,uncertain,TEST FIXTURE not lexicon data,yes,yes,1
