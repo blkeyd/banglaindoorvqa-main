@@ -1,0 +1,112 @@
+# configs/prompts.yaml
+# BanglaIndoorVQA: the experiment prompts (Design 6.2), copied from the locked design.
+# The team proofreads the Bangla once before the pilot. A prompt may change between
+# the pilot and Gate E only (Design 6.1). To change one:
+#   1. edit the text here,
+#   2. give prompt_version a new value (exp-v2, ...), here and in the lock,
+#   3. run  python scripts/asset8_harness.py prompts  and copy the printed sha256
+#      into the lock,
+#   4. write a decision row.
+# The harness stops if the text and the lock disagree, so a stray edit cannot pass.
+# No dataset text is in this file.
+
+prompt_version: "exp-v1"
+
+lock:
+  prompt_version: "exp-v1"
+  sha256: "e0d006e7cd0e2559d3e80cd0cda24b9afa7ac2661c579916811a9cc765478b73"
+
+# Used only for a check: with_image minus this clause must equal no_image
+# (Design 6.1: no-image versions remove only the clause that mentions the image).
+image_clause:
+  open_bn_bn: " ছবিটি দেখে"
+  open_en_en: " by looking at the image"
+  fc_bn: "ছবিটি দেখে "
+  fc_en: " by looking at the image"
+
+# Used only for a check: open_bn_bn_specific must equal open_bn_bn with this
+# sentence added after the answer-language sentence (Design 6.2, N-BBs).
+answer_language_sentence_bn: "উত্তর শুধু বাংলায় লিখুন।"
+specificity_sentence: "জিনিসটির সাধারণ শ্রেণির নাম নয়, বাংলাদেশের বাসাবাড়িতে একে যে নির্দিষ্ট নামে ডাকা হয় সেই নামটি লিখুন।"
+
+templates:
+  # L-BB, N-BB, R-BB (with image); L-BB0, R-BB0 (no image)
+  open_bn_bn:
+    with_image: |-
+      নিচের প্রশ্নটির উত্তর ছবিটি দেখে দিন। উত্তর শুধু বাংলায় লিখুন। উত্তর যতটা সম্ভব ছোট রাখুন: শুধু নাম, সংখ্যা বা এক-দুই শব্দ। কোনো ব্যাখ্যা দেবেন না।
+      প্রশ্ন: {question_bn}
+      উত্তর:
+    no_image: |-
+      নিচের প্রশ্নটির উত্তর দিন। উত্তর শুধু বাংলায় লিখুন। উত্তর যতটা সম্ভব ছোট রাখুন: শুধু নাম, সংখ্যা বা এক-দুই শব্দ। কোনো ব্যাখ্যা দেবেন না।
+      প্রশ্ন: {question_bn}
+      উত্তর:
+
+  # L-BE, N-BE
+  open_bn_en:
+    with_image: |-
+      নিচের প্রশ্নটির উত্তর ছবিটি দেখে দিন। উত্তর শুধু ইংরেজিতে লিখুন। উত্তর যতটা সম্ভব ছোট রাখুন: শুধু নাম, সংখ্যা বা এক-দুই শব্দ। কোনো ব্যাখ্যা দেবেন না।
+      প্রশ্ন: {question_bn}
+      উত্তর:
+
+  # L-EE, R-EE (with image); L-EE0 (no image)
+  open_en_en:
+    with_image: |-
+      Answer the question below by looking at the image. Write the answer in English only. Keep the answer as short as possible: only a name, a number, or one or two words. Do not explain.
+      Question: {question_en}
+      Answer:
+    no_image: |-
+      Answer the question below. Write the answer in English only. Keep the answer as short as possible: only a name, a number, or one or two words. Do not explain.
+      Question: {question_en}
+      Answer:
+
+  # L-EB
+  open_en_bn:
+    with_image: |-
+      Answer the question below by looking at the image. Write the answer in Bangla (Bengali script) only. Keep the answer as short as possible: only a name, a number, or one or two words. Do not explain.
+      Question: {question_en}
+      Answer:
+
+  # N-BBs (specificity prompt)
+  open_bn_bn_specific:
+    with_image: |-
+      নিচের প্রশ্নটির উত্তর ছবিটি দেখে দিন। উত্তর শুধু বাংলায় লিখুন। জিনিসটির সাধারণ শ্রেণির নাম নয়, বাংলাদেশের বাসাবাড়িতে একে যে নির্দিষ্ট নামে ডাকা হয় সেই নামটি লিখুন। উত্তর যতটা সম্ভব ছোট রাখুন: শুধু নাম, সংখ্যা বা এক-দুই শব্দ। কোনো ব্যাখ্যা দেবেন না।
+      প্রশ্ন: {question_bn}
+      উত্তর:
+
+  # N-FCB (with image); N-FCB0 (no image)
+  fc_bn:
+    with_image: |-
+      ছবিটি দেখে নিচের প্রশ্নটির উত্তর দিন। চারটি বিকল্পের মধ্য থেকে সঠিক নামটি বেছে নিন। শুধু বিকল্পের অক্ষরটি লিখুন: ক, খ, গ অথবা ঘ।
+      প্রশ্ন: {question_bn}
+      ক) {option_1}
+      খ) {option_2}
+      গ) {option_3}
+      ঘ) {option_4}
+      উত্তর:
+    no_image: |-
+      নিচের প্রশ্নটির উত্তর দিন। চারটি বিকল্পের মধ্য থেকে সঠিক নামটি বেছে নিন। শুধু বিকল্পের অক্ষরটি লিখুন: ক, খ, গ অথবা ঘ।
+      প্রশ্ন: {question_bn}
+      ক) {option_1}
+      খ) {option_2}
+      গ) {option_3}
+      ঘ) {option_4}
+      উত্তর:
+
+  # N-FCE (with image); N-FCE0 (no image)
+  fc_en:
+    with_image: |-
+      Answer the question below by looking at the image. Choose the correct name from the four options. Write only the option letter: A, B, C or D.
+      Question: {question_en}
+      A) {option_1}
+      B) {option_2}
+      C) {option_3}
+      D) {option_4}
+      Answer:
+    no_image: |-
+      Answer the question below. Choose the correct name from the four options. Write only the option letter: A, B, C or D.
+      Question: {question_en}
+      A) {option_1}
+      B) {option_2}
+      C) {option_3}
+      D) {option_4}
+      Answer:

@@ -1,0 +1,60 @@
+# configs/models.yaml
+# BanglaIndoorVQA: the three models and their fixed settings (Design 5.1, 5.2;
+# DESIGN_ADDENDUM D1). Changing a value here is a decision, not a tweak.
+# Verify every model ID on its model card, and the prices on Google's pricing
+# page, in the week of each run (Design 0.2 rule 5).
+
+models:
+  gemini:
+    backend: gemini
+    model_id: gemini-3.6-flash          # Design 5.1. Fallback order: Design 5.5 (needs a decision row).
+    thinking_level: minimal             # Design 5.2. Thinking tokens are logged for every call.
+    max_output_tokens: 256              # Design 5.2. For Gemini this limit includes thinking tokens.
+    media_resolution: MEDIA_RESOLUTION_HIGH   # D146: at most 1,120 tokens per image.
+    # No temperature, top_p, top_k, candidate_count, system prompt or prefilled
+    # model turn is ever sent (D126). The harness checks every request body.
+    prices:                             # USD per 1M tokens; output includes thinking
+      valid_until: "2026-12-31"         # Google: 1.50 / 7.50 (Batch 0.75 / 3.75) from 2027-01-01
+      standard: {in: 0.75,  out: 3.75}
+      batch:    {in: 0.375, out: 1.875}
+      source: "DESIGN_ADDENDUM D1: https://ai.google.dev/gemini-api/docs/pricing read 2026-10-04"
+    bounds:                             # upper bounds, used only for the cost check before a call
+      image_tokens: 2400
+      text_tokens_per_char: 1.5
+      text_tokens_extra: 64
+    standard:
+      timeout_s: 120
+      max_attempts: 6
+      pause_s: 0.3
+    batch:
+      max_enqueued_tokens: 3000000      # Tier 1 limit for Gemini 3.6 Flash (rate-limits page read 2026-10-06)
+      enqueue_safety: 0.9
+      est_tokens_image_request: 1300    # estimates, used only to plan the queue
+      est_tokens_text_request: 250
+      max_requests_per_job: 1200
+      max_file_mb: 1500                 # Google's limit is 2 GB per input file
+      max_attempts_per_item: 3
+      upload_mime_type: application/jsonl
+      unknown_wait_s: 180               # wait before a job with unknown outcome is declared absent
+      delete_input_file_after_collect: true
+
+  qwen:
+    backend: hf
+    family: qwen3_5
+    model_id: Qwen/Qwen3.5-4B           # Design 5.1
+    revision: null                      # null: the newest commit is resolved at the first run of a stage and then fixed.
+                                        # Paste the printed commit hash here before Gate E.
+    enable_thinking: false              # Design 5.2
+    max_new_tokens: 32                  # Design 5.2
+    max_pixels: 786432                  # Design 5.2: 1,024 x 768
+    dtype: bfloat16                     # Design 5.2
+
+  gemma:
+    backend: hf
+    family: gemma4
+    model_id: google/gemma-4-E4B-it     # Design 5.1
+    revision: null
+    enable_thinking: false              # Design 5.2: thinking off
+    max_new_tokens: 32
+    max_pixels: null                    # Design 5.2: Gemma 4 processor default
+    dtype: bfloat16

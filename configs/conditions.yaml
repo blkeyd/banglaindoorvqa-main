@@ -1,0 +1,58 @@
+# configs/conditions.yaml
+# BanglaIndoorVQA: THE one file that defines every condition (Design 4.9, 7).
+# Condition IDs: first letter = experiment (L, N, R); then question language and
+# answer language (B = Bangla, E = English); a trailing 0 = no image.
+# Numbers are those of DESIGN_ADDENDUM A1. No dataset text is in this file.
+
+conditions:
+  # EXP-L: language and image factorial (Design 7.1)
+  L-BB:   {experiment: EXP-L, template: open_bn_bn, image: true,  question_lang: bn, answer_lang: bn, probe: P-CORE-CLOSED}
+  L-BE:   {experiment: EXP-L, template: open_bn_en, image: true,  question_lang: bn, answer_lang: en, probe: P-CORE-CLOSED}
+  L-EB:   {experiment: EXP-L, template: open_en_bn, image: true,  question_lang: en, answer_lang: bn, probe: P-CORE-CLOSED}
+  L-EE:   {experiment: EXP-L, template: open_en_en, image: true,  question_lang: en, answer_lang: en, probe: P-CORE-CLOSED}
+  L-BB0:  {experiment: EXP-L, template: open_bn_bn, image: false, question_lang: bn, answer_lang: bn, probe: P-CORE-CLOSED}
+  L-EE0:  {experiment: EXP-L, template: open_en_en, image: false, question_lang: en, answer_lang: en, probe: P-CORE-CLOSED}
+  # EXP-N: naming probe (Design 7.2)
+  N-BB:   {experiment: EXP-N, template: open_bn_bn,          image: true, question_lang: bn, answer_lang: bn, probe: P-NAME}
+  N-BE:   {experiment: EXP-N, template: open_bn_en,          image: true, question_lang: bn, answer_lang: en, probe: P-NAME}
+  N-BBs:  {experiment: EXP-N, template: open_bn_bn_specific, image: true, question_lang: bn, answer_lang: bn, probe: P-NAME}
+  N-FCB:  {experiment: EXP-N, template: fc_bn, image: true,  question_lang: bn, answer_lang: bn, options_lang: bn, probe: P-CLUST}
+  N-FCB0: {experiment: EXP-N, template: fc_bn, image: false, question_lang: bn, answer_lang: bn, options_lang: bn, probe: P-CLUST}
+  N-FCE:  {experiment: EXP-N, template: fc_en, image: true,  question_lang: en, answer_lang: en, options_lang: en, probe: P-FCE}
+  N-FCE0: {experiment: EXP-N, template: fc_en, image: false, question_lang: en, answer_lang: en, options_lang: en, probe: P-FCE}
+  # EXP-R: evaluation of the base and the fine-tuned model (Design 7.3). For the
+  # base model, an item already answered in EXP-L with the same prompt, image and
+  # settings is copied from the cache instead of being run again (reuse_from).
+  R-BB:   {experiment: EXP-R, template: open_bn_bn, image: true,  question_lang: bn, answer_lang: bn, probe: R-TEST, reuse_from: L-BB}
+  R-EE:   {experiment: EXP-R, template: open_en_en, image: true,  question_lang: en, answer_lang: en, probe: R-TEST, reuse_from: L-EE}
+  R-BB0:  {experiment: EXP-R, template: open_bn_bn, image: false, question_lang: bn, answer_lang: bn, probe: R-TEST, reuse_from: L-BB0}
+
+# Short names for --conditions
+sets:
+  EXP-L:      [L-BB, L-BE, L-EB, L-EE, L-BB0, L-EE0]
+  EXP-N-open: [N-BB, N-BE, N-BBs]
+  EXP-N-fcb:  [N-FCB, N-FCB0]
+  EXP-N-fce:  [N-FCE, N-FCE0]
+  EXP-R:      [R-BB, R-EE, R-BB0]
+
+# Probe files (Drive probes/) and their sizes. Stage main refuses any other size.
+probes:
+  P-CORE-CLOSED: {file: P-CORE-CLOSED.json, expected_n: 1118}
+  P-NAME:        {file: P-NAME.json,        expected_n: 1000}
+  P-CLUST:       {file: P-CLUST.json,       expected_n: 492}
+  P-FCE:         {file: null,               expected_n: null}   # written by ASSET-11 after Gate A
+  R-TEST:        {file: R-TEST.json,        expected_n: 1449}
+  PILOT:         {file: PILOT.json,         expected_n: 100}
+  P-CORE:        {file: P-CORE.json,        expected_n: 2040}   # harness tests only
+
+# Stages. Outputs of one stage are never read by another (decision D144).
+#   smoke: harness tests. Any probe, any subset. Never reported.
+#   pilot: the PILOT set (Design 11). Gemini in standard mode (Design 12.1).
+#   main:  EXP-L, EXP-N, EXP-R. Gemini in Batch mode. Needs the tag gate-E, a clean
+#          Git tree and the full probe set of each condition.
+# api_cap_usd is this harness's own cap per stage, checked on the shared ledger.
+# The project hard stop of 40 USD (Design 12.1) is checked on top of it.
+stages:
+  smoke: {gemini_modes: [standard, batch], api_cap_usd: 0.50, probe_rule: any}
+  pilot: {gemini_modes: [standard],        api_cap_usd: 2.00, probe_rule: PILOT}
+  main:  {gemini_modes: [batch],           api_cap_usd: 20.00, probe_rule: condition}
