@@ -1,0 +1,59 @@
+# configs/finetune.yaml
+# BanglaIndoorVQA, EXP-R: the one fine-tuning setting (Design 7.3) and its runs.
+# Decisions D170 to D178 (DESIGN_ADDENDUM G). src/finetune.py compares the values
+# marked [Design 7.3] with the design and stops if one differs: a change there is a
+# design change, not a tweak. No dataset text is in this file.
+
+base_model: qwen            # key in configs/models.yaml. Design 5.4: Qwen3.5-4B, then Gemma 4 E4B
+condition: L-BB             # training prompt = build_prompt() of this condition, with the image [Design 7.3]
+
+# D171: one PEFT version for training and for adapter evaluation. null until Gate G:
+# the dry run records the installed version; write it here once Gate G has passed.
+# A seed run stops while this is null or differs from the installed version.
+peft_version: null
+
+lora:                       # [Design 7.3]
+  r: 16
+  alpha: 32
+  dropout: 0.05
+
+optimiser:
+  lr: 1.0e-4                # [Design 7.3]
+  schedule: cosine          # [Design 7.3]
+  warmup_ratio: 0.03        # [Design 7.3] of the planned weight updates, rounded up
+  weight_decay: 0.01        # [Design 7.3]
+  betas: [0.9, 0.999]       # D177 (AdamW default)
+  eps: 1.0e-8               # D177 (AdamW default)
+  max_grad_norm: 1.0        # D177
+
+batch:                      # [Design 7.3] effective 16
+  per_device: 2
+  accumulation: 8
+
+max_seq_tokens: 1536        # [Design 7.3] a longer example is left out and counted
+epochs: 2                   # [Design 7.3] at most
+eval_every_epochs: 0.25     # [Design 7.3]
+patience: 2                 # [Design 7.3] evaluations without a better validation loss
+val_n: 400                  # [Design 7.3] fixed list FT-VAL400.ids.txt (D173)
+checkpoint_every_updates: 50   # resume state; not a model checkpoint that is kept
+
+runs:
+  ft-dry: {profile: dry,  seed: 42, n_train: 100, epochs: 1, n_val: 20, early_stop: false}   # Gate G
+  ft-s42: {profile: seed, seed: 42}
+  ft-s43: {profile: seed, seed: 43}
+  ft-s44: {profile: seed, seed: 44}
+
+gate_g:
+  n_generate: 20            # [Design 7.3] R-TEST items, generated under R-BB
+  generate_condition: R-BB
+  loss_window: 50           # [Design 7.3] forward steps (batches of 2)
+  loss_floor_last10: 0.10   # mean loss of steps 41 to 50 must stay above this
+  loss_floor_any: 0.01      # no single step below this
+  short_answers_min: 18     # of 20: not empty, Bangla script or digits, 8 words or fewer
+  probe:                    # D178: overfit probe on training examples, own short run
+    n: 8
+    lr: 5.0e-4
+    max_updates: 60
+    stop_loss: 0.05
+    max_target_chars: 20
+    min_reproduced: 7
