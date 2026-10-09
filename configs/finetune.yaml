@@ -10,7 +10,7 @@ condition: L-BB             # training prompt = build_prompt() of this condition
 # D171: one PEFT version for training and for adapter evaluation. null until Gate G:
 # the dry run records the installed version; write it here once Gate G has passed.
 # A seed run stops while this is null or differs from the installed version.
-peft_version: null
+peft_version: "0.21.0"
 
 lora:                       # [Design 7.3]
   r: 16
