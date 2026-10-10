@@ -1,0 +1,5 @@
+qa_id,probes,qa_type,reason,source,added_at
+H05_0110_q1,P-CORE-CLOSED,obj_name,gold_not_one_object,is_name = no,gate-A
+H35_0041_q1,R-TEST,obj_name,gold_not_one_object,is_name = no,gate-A
+H35_0045_q3,R-TEST,obj_property,gold_wrong_kind,manual,gate-A
+H38_0006_q1,P-CORE-CLOSED|R-TEST,obj_name,gold_not_one_object,is_name = no,gate-A

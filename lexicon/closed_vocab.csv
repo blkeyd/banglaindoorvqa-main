@@ -1,0 +1,64 @@
+kind,class_id,forms_bn,forms_en,note
+room,bathroom,বাথরুম|বাথরুমে|ওয়াশরুম,bathroom|washroom,room name and gold forms pre-filled; add the other forms
+room,bedroom,শোবার ঘর|শোভার ঘর|বেডরুম,bedroom,room name and gold forms pre-filled; add the other forms
+room,kitchen,রান্নাঘর|কিচেন রুম|কিচেন,kitchen|kitchen room,room name and gold forms pre-filled; add the other forms
+room,living room,বসার ঘর|লিভিং রুম|ডাইনিং রুম|কমনরুম|ড্রয়িং রুম,living room|dining room|common room| drawing room,room name and gold forms pre-filled; add the other forms
+material,ceramic,সিরামিকের,ceramic,
+material,coconut,নারকেলের|নারকেল,coconut,
+material,cotton,তুলা|উলের|উল,wool|cotton,kept
+material,egg,ডিম,egg,
+material,fabric,কাপড়ের|ক্যানভাস|চামড়ার|কাপড়|চামড়া,fabric|leather|canvas|cloth,kept
+material,foam,ফোমের|ফোম,foam,
+material,glass,কাঁচের|গ্লাস|কাচের|কাঁচ|কাচ,glass,
+material,liquid,রঙ|জেল,gel|paint,
+material,metal,স্টিলের|ধাতুর|লোহা|গ্রিল|অ্যালুমিনিয়াম|ষ্টীল|স্টিল|ধাতু,steel|metal|iron|grill|aluminium|aluminum,
+material,paper,কাগজের|কাগজ,paper,
+material,plastic,প্লাস্টিকের|পাটের|প্লাস্টিক,plastic|jute,kept
+material,soil,মাটির|মাটি,soil,
+material,stone,পাথরের|পাথর,stone,
+material,sugar,ময়দা|চিনি,flour|sugar,
+material,wood,পারটেক্স|কাঠের|কাঠ,wood|partex,
+material,yarn,সুতা|সুতার,yarn|thread,
+colour,black,কাল|কালো,black,
+colour,blue,নীল|আকাশি|নিল|আকাশী,blue|sky blue,
+colour,brown,বাদামি|খয়েরি|বাদামী|খয়েরী,brown,
+colour,golden,সোনালী|সোনালি,golden,
+colour,gray,ধূসর,gray|grey,
+colour,green,সবুজ,green,
+colour,maroon,মেরুন,maroon,
+colour,orange,কমলা,orange,
+colour,pink,গোলাপি|গোলাপী,pink,
+colour,purple,বেগুনি|বেগুনী,purple|violet,
+colour,red,লাল,red,
+colour,silver,সিলভার|রুপালি|রুপালী,silver,
+colour,white,সাদা,white,
+colour,yellow,হ্লুদ|হলুদ|হলদে,yellow,
+number,0,শূন্য|কোনোটি না|শূন্যটি,zero,fill it or delete the row
+number,1,একটি|এক|একটা,one,a gold number: required
+number,2,দুইটি|দুটি|দুটো|দুই|দুটা,two,a gold number: required
+number,3,তিনটি|তিন|তিনটা,three,a gold number: required
+number,4,চারটি|চার|চারটা,four,a gold number: required
+number,5,পাঁচটি|পাঁচ|পাঁচটা,five,a gold number: required
+number,6,ছয়টি|ছয়|ছয়টা,six,a gold number: required
+number,7,সাতটি|সাত|সাতটা,seven,fill it or delete the row
+number,8,আটটি|আট|আটটা,eight,fill it or delete the row
+number,9,নয়টি|নয়টা,nine,a gold number: required
+number,10,দশটি|দশ|দশটা,ten,fill it or delete the row
+number,11,এগারোটি|এগারো|এগারোটা,eleven,fill it or delete the row
+number,12,বারোটি|বারো|বারোটা,twelve,fill it or delete the row
+number,13,তেরোটি|তেরো|তেরোটা,thirteen,fill it or delete the row
+number,14,চোদ্দটি|চৌদ্দ|চোদ্দ|চোদ্দটা,fourteen,fill it or delete the row
+number,15,পনেরোটি|পনেরো|পনেরোটা,fifteen,a gold number: required
+number,16,ষোলটি|ষোল|ষোলটা|ষোলো,sixteen,fill it or delete the row
+number,17,সতেরোটি|সতেরটি|সতের|সতেরটা|সতেরো,seventeen,fill it or delete the row
+number,18,আঠারোটি|আঠারো|আঠারোটা,eighteen,fill it or delete the row
+number,19,উনিশটি|উনিশ|ঊনিশ|উনিশটা|ঊনিশটা,nineteen,fill it or delete the row
+number,20,বিশটি|বিশ|কুড়ি|বিশটা,twenty,fill it or delete the row
+number,30,ত্রিশটি|ত্রিশ|ত্রিশটা,thirty,fill it or delete the row
+number,40,চল্লিশটি|চল্লিশ|চল্লিশটা,forty,fill it or delete the row
+number,50,পঞ্চাশটি|পঞ্চাশ|পঞ্চাশটা,fifty,fill it or delete the row
+number,60,ষাটটি|ষাট|ষাটটা,sixty,fill it or delete the row
+number,70,সত্তরটি|সত্তর|সত্তরটা,seventy,fill it or delete the row
+number,80,আশিটি|আশি|আশিটা,eighty,fill it or delete the row
+number,90,নব্বইটি|নব্বই|নব্বইটা,ninety,fill it or delete the row
+number,100,একশোটি|একশো|একশ|একশোটা,hundred,fill it or delete the row

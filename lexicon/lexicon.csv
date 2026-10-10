@@ -1,0 +1,232 @@
+name_id,name_bn,variants_bn,canonical_en,variants_en,super_bn,super_en,cluster_id,siblings,room_scope,cultural_specificity,origin3,origin_note,en_route,en_unique,freq_obj_name
+N_39ae315502,অ্যাকুরিয়াম,,aquarium,fish tank,,,,,living room,globally_common,english,rule: modern English,yes,yes,2
+N_2d57b829b8,আয়না,,mirror,,,,,,bedroom,globally_common,other_loan,ফা.,no,yes,15
+N_07a59ab97c,আলনা,,clothes rack,,আসবাব,furniture,,,bedroom,globally_common,inherited,স. আলম্বন >,no,yes,2
+N_0616a73a8b,আলমারি,ছোট আলমারি,closet,almirah,আসবাব,furniture,সংরক্ষণ-আসবাব (আলমারি/কেবিনেট/শোকেস),ওয়াল শোকেস|ওয়ারড্রব|বইয়ের তাক|কেবিনেট|শোকেস|কর্নার স্ট্যান্ড|কাবার্ড,bedroom,globally_common,other_loan,পো.,no,yes,72
+N_9094c8ef82,ইউকিলিলি,উকুলেলে,ukulele,,বাদ্যযন্ত্র,musical instrument,,,any,not_rated,english,rule: modern English,yes,yes,1
+N_1d9c62a703,ইনডাকশন চুলা,,induction stove,induction cooker,চুলা,stove,,,kitchen,not_rated,inherited,স.চুল্লি >,no,yes,3
+N_943f70a604,ইলেকট্রিক চুলা,বৈদ্যুতিক চুলা,electric stove,electric cooker,চুলা,stove,চুলার ধরন,গ্যাসের চুলা|চুলা|মাটির চুলা,kitchen,globally_common,inherited,স. চুল্লি >,no,yes,3
+N_aa86a44c56,এক্সহস্ট ফ্যান,,exhaust fan,extractor fan|ventilation fan,বৈদ্যুতিক যন্ত্র,electrical appliance,ফ্যানের ধরন,সিলিং ফ্যান|টেবিল ফ্যান|স্ট্যান্ড ফ্যান,any,globally_common,english,ই.,yes,yes,15
+N_f1d1bad1c2,এসি,,air conditioner,ac|aircon,বৈদ্যুতিক যন্ত্র,electrical appliance,,,any,globally_common,english,rule: modern English,yes,yes,15
+N_3bb0fcb6a9,ওভেন,,oven,electric oven|baking oven,রান্নার যন্ত্র,cooking appliance,,,kitchen,globally_common,english,ই.,yes,yes,7
+N_25c5233ee9,ওয়াটার হিটার,গিজার,water heater,geyser|heater,বৈদ্যুতিক যন্ত্র,electrical appliance,বাথরুমের কল / পানি ব্যবস্থা,বেসিন|কল|ঝরনা|জেট স্প্রে|সিংক|ঝরনার নব|বদনা,bathroom,globally_common,english,ই. heater,yes,yes,7
+N_230349381c,ওয়ারড্রব,ওয়ারড্রোব|ওয়ড্রোব|ওয়াড্রোব,wardrobe,,আসবাব,furniture,সংরক্ষণ-আসবাব (আলমারি/কেবিনেট/শোকেস),আলমারি|ওয়াল শোকেস|বইয়ের তাক|কেবিনেট|শোকেস|কর্নার স্ট্যান্ড|কাবার্ড,bedroom,globally_common,english,rule: modern English,yes,yes,20
+N_d2725f98eb,ওয়াল শোকেস,,wall showcase,display cabinet,শোকেস,showcase,সংরক্ষণ-আসবাব (আলমারি/কেবিনেট/শোকেস),আলমারি|ওয়ারড্রব|বইয়ের তাক|কেবিনেট|শোকেস|কর্নার স্ট্যান্ড|কাবার্ড,living room,globally_common,english,rule: modern English,yes,yes,27
+N_b98b905d93,ওয়াল হ্যাঙ্গার,,wall hanger,wall hook|hanger,,,,,bedroom,globally_common,english,rule: modern English,yes,no,9
+N_4ea69bd2d4,ওয়াশিং মেশিন,,washing machine,washer,,,,,living room,globally_common,english,ই. machine,yes,yes,9
+N_701d56419b,কড়াই,কড়ায়,wok,frying pan|pan,রান্নার পাত্র,cookware,রান্নার পাত্র (পট/প্যান),হাঁড়ি|দেকচি|গামলা|তাওয়া|পাতিল|কেটলি|প্রেশার কুকার,kitchen,globally_common,inherited,স. কটাহ >,no,yes,18
+N_4b42ec5808,কনডেন্সার ইউনিট,,condenser unit,ac condenser,,,,,any,not_rated,english,rule: modern English,yes,yes,1
+N_bc48e4ed1c,কন্ট্রোলার,,controller,gamepad,,,,,bedroom,not_rated,english,rule: modern English,yes,yes,1
+N_a274691bdc,কফি মিক্সার,,coffee mixer,,রান্নাঘরের যন্ত্র,kitchen appliance,,,kitchen,not_rated,english,rule: modern English,yes,yes,0
+N_7ef1bf1176,কমোড,কোমড,toilet,commode|toilet bowl,,,,,bathroom,globally_common,english,rule: modern English,yes,yes,20
+N_947ceaf491,কম্বল,,blanket,,বিছানার কাপড়,bedding,বিছানা ও বিছানার কাপড়,বিছানা|বালিশ|কোলবালিশ|কাঁথা|তোশক|চাদর|চৌকি|লেপ,bedroom,not_rated,inherited,স. √কম্ব+উ,no,no,1
+N_5ad88fb244,কম্বল রাখার ব্যাগ,কম্বলের ব্যাগ,blanket bag,,,,,,any,not_rated,english,ই.,no,yes,2
+N_c6f0329429,কর্নার স্ট্যান্ড,,corner stand,,আসবাব,furniture,সংরক্ষণ-আসবাব (আলমারি/কেবিনেট/শোকেস),আলমারি|ওয়াল শোকেস|ওয়ারড্রব|বইয়ের তাক|কেবিনেট|শোকেস|কাবার্ড,living room,not_rated,english,ই.,yes,yes,3
+N_6db5b2d275,কল,পানির কল,tap,faucet|water tap,,,বাথরুমের কল / পানি ব্যবস্থা,বেসিন|ঝরনা|জেট স্প্রে|সিংক|ওয়াটার হিটার|ঝরনার নব|বদনা,bathroom,globally_common,inherited,স. কলা >,no,yes,17
+N_05af4c57eb,কলমদানি,,pen holder,pen stand,ধারক,holder,,,bedroom,globally_common,other_loan,ফা.,no,yes,4
+N_0bc0f297ff,কলস,কলসি,pitcher,water pot,পাত্র,container,পানি ও পরিবেশনের পাত্র,বালতি|বোতল|মগ|জগ|গ্যালন,kitchen,culturally_specific,inherited,স. কল+√শু+আ,no,yes,4
+N_40d3f77a24,কলিং বেল,,calling bell,doorbell,ঘণ্টা,bell,,,living room,not_rated,english,ই. bell,yes,yes,3
+N_72dc030e82,কাঁচি,,scissors,shears,কাটার যন্ত্র,cutting tool,,,any,globally_common,other_loan,তুর.,no,yes,7
+N_0020b07ab3,কাঁথা,,quilt,,বিছানার কাপড়,bedding,বিছানা ও বিছানার কাপড়,বিছানা|বালিশ|কোলবালিশ|কম্বল|তোশক|চাদর|চৌকি|লেপ,bedroom,not_rated,inherited,স. কথা >,no,no,1
+N_33907ffe6e,কাপড় ঝোলানোর রিং,কাপড় ঝুলানো রিং|কাপড় ঝুলানোর রিং,hanging ring,ring hanger,,,,,bedroom,not_rated,english,rule: modern English,no,yes,6
+N_99a142b977,কাপড়ের স্ট্যান্ড,কাপড় রাখার স্ট্যান্ড|কাপড় ঝুলানোর স্ট্যান্ড,clothes stand,,আসবাব,furniture,,,bedroom,not_rated,english,ই.,no,yes,3
+N_3d99534870,কাবার্ড,,cupboard,,আসবাব,furniture,সংরক্ষণ-আসবাব (আলমারি/কেবিনেট/শোকেস),আলমারি|ওয়াল শোকেস|ওয়ারড্রব|বইয়ের তাক|কেবিনেট|শোকেস|কর্নার স্ট্যান্ড,bedroom,not_rated,english,rule: modern English,yes,yes,3
+N_b892a5b45c,কার্পেট,গালিচা,carpet,,,,মেঝের মাদুর / কার্পেট,জায়নামাজ|পাপোশ|মাদুর|শীতলপাটি,any,not_rated,other_loan,ফ.,yes,yes,0
+N_20e9fddab4,কিবোর্ড,কীবোর্ড,keyboard,,ইনপুট ডিভাইস,input device,,,bedroom,globally_common,english,ই. (looked up as কী-বোর্ড),yes,yes,1
+N_fed2f3742e,কুলা,,winnowing basket,winnowing tray,ঝুড়ি,basket,ঝুড়ি ও ছাঁকনি জাতীয়,ঝুড়ি|ছাঁকনি|চালুনি|ঝাঁঝরি|ডালা,kitchen,not_rated,inherited,স. কুল্য >,no,yes,0
+N_00ccd22656,কৃত্রিম গাছ,,artificial plant,fake plant,সাজসজ্জা,decoration,,,any,not_rated,inherited,স. গচ্ছ >,no,yes,1
+N_201689b3ed,কেক,,cake,,,,,,any,not_rated,english,ই.,yes,yes,1
+N_e3cdc5f159,কেটলি,,kettle,tea kettle|electric kettle,রান্নার পাত্র,cookware,রান্নার পাত্র (পট/প্যান),কড়াই|হাঁড়ি|দেকচি|গামলা|তাওয়া|পাতিল|প্রেশার কুকার,kitchen,not_rated,english,ই.,yes,yes,1
+N_9251080742,কেবিনেট,কাঠের কেবিনেট,cabinet,,আসবাব,furniture,সংরক্ষণ-আসবাব (আলমারি/কেবিনেট/শোকেস),আলমারি|ওয়াল শোকেস|ওয়ারড্রব|বইয়ের তাক|শোকেস|কর্নার স্ট্যান্ড|কাবার্ড,kitchen,globally_common,english,rule: modern English,yes,yes,11
+N_5d03de7a9d,কোলবালিশ,কোল বালিশ,bolster,body pillow|long pillow|hug pillow,বিছানার সামগ্রী,bedding,বিছানা ও বিছানার কাপড়,বিছানা|বালিশ|কম্বল|কাঁথা|তোশক|চাদর|চৌকি|লেপ,bedroom,globally_common,inherited,বা.,no,yes,5
+N_ad405d43d9,কৌটা,,jar,tin,,,ছোট কৌটা / জার,বয়াম|মসলার কৌটা,kitchen,globally_common,inherited,দেশি.,no,no,3
+N_1d60a8fca1,ক্যালেন্ডার,,calendar,wall calendar|desk calendar,,,,,any,globally_common,other_loan,ফ.,yes,yes,6
+N_1a4bac9828,খাঁচা,খাচা,cage,,,,,,living room,not_rated,other_loan,হি.,no,yes,1
+N_bf4e71ef63,খুন্তি,,spatula,,রান্নার সরঞ্জাম,kitchen tool,,,kitchen,not_rated,inherited,স. খনিত্র >,no,yes,1
+N_df3e79fa39,খেলনা,খেলনাঘর,toy,,,,,,any,not_rated,inherited,স. খেলনক >,no,yes,4
+N_79edf08b07,গাছ,,tree,plant,,,,,any,not_rated,inherited,স. গচ্ছ >,no,yes,2
+N_b593eef684,গামছা,,thin cotton towel,thin towel,,,তোয়ালে জাতীয়,তোয়ালে,bathroom,not_rated,inherited,দেশি.,no,yes,0
+N_b79c9bbcaa,গামলা,,bowl,,পাত্র,container,রান্নার পাত্র (পট/প্যান),কড়াই|হাঁড়ি|দেকচি|তাওয়া|পাতিল|কেটলি|প্রেশার কুকার,kitchen,globally_common,other_loan,পো.,no,no,5
+N_42a0e2e0bc,গিটার ব্যাগ,,guitar bag,guitar case,ব্যাগ,bag,,,any,not_rated,english,ই.,yes,yes,2
+N_6295d4f6c8,গ্যালন,,gallon,,পাত্র,container,পানি ও পরিবেশনের পাত্র,বালতি|বোতল|মগ|কলস|জগ,bathroom,not_rated,english,ই.,yes,yes,1
+N_c7801ccc62,গ্যাসের চুলা,,gas stove,gas burner|gas cooker,চুলা,stove,চুলার ধরন,ইলেকট্রিক চুলা|চুলা|মাটির চুলা,kitchen,globally_common,inherited,স. চুল্লি >,no,yes,25
+N_69ae8f9abf,গ্লাস,,glass,drinking glass|tumbler,পাত্র,container,,,kitchen,globally_common,english,ই. glass,yes,yes,16
+N_362c52f766,গ্লাস স্ট্যান্ড,,glass stand,glass holder,স্ট্যান্ড,stand,,,kitchen,not_rated,english,ই.,yes,yes,2
+N_f766039fb7,গ্লু গান,,glue gun,,,,,,any,not_rated,english,rule: modern English,yes,yes,1
+N_9b733ebfc5,চপিং বোর্ড,,chopping board,cutting board,রান্নার সরঞ্জাম,kitchen tool,,,kitchen,not_rated,english,ই. board,yes,yes,2
+N_66bce8c397,চশমার বাক্স,,eyeglass case,spectacle case,বক্স,box,,,any,not_rated,english,ই. box>,no,yes,1
+N_262affe207,চাকু,,utility knife,pocket knife,ছুরি,knife,কাটা ও বাটা,বটি|ছুরি|শিল-পাটা|হামানদিস্তা|দা,kitchen,not_rated,other_loan,তুর.,no,yes,0
+N_78fd4de335,চাদর,,bedsheet,bed sheet|bedcover,বিছানার কাপড়,bedding,বিছানা ও বিছানার কাপড়,বিছানা|বালিশ|কোলবালিশ|কম্বল|কাঁথা|তোশক|চৌকি|লেপ,bedroom,not_rated,other_loan,ফা.,no,yes,0
+N_538e453170,চালুনি,,sieve,strainer|mesh sieve,রান্নার সরঞ্জাম,kitchen tool,ঝুড়ি ও ছাঁকনি জাতীয়,ঝুড়ি|ছাঁকনি|কুলা|ঝাঁঝরি|ডালা,kitchen,not_rated,inherited,বা.,no,no,1
+N_f13caeae85,চিত্রকর্ম,একটি চিত্রকর্ম,painting,artwork|picture|art piece,,,,,any,globally_common,inherited,স. চিত্র+কর্মন,no,yes,9
+N_46b599683f,চিরুনি,চিরনি,comb,hairbrush,প্রসাধন সরঞ্জাম,grooming tool,,,any,not_rated,inherited,বা.,no,yes,4
+N_eb17bd2fb5,চুলা,,stove,,,,চুলার ধরন,গ্যাসের চুলা|ইলেকট্রিক চুলা|মাটির চুলা,kitchen,globally_common,inherited,স. চুল্লি >,no,yes,3
+N_2f6f0442ed,চেয়ার,,chair,,আসন,seat,,,any,globally_common,english,ই.,yes,yes,38
+N_0ba0219033,চৌকি,,cot,wooden bed,আসবাব,furniture,বিছানা ও বিছানার কাপড়,বিছানা|বালিশ|কোলবালিশ|কম্বল|কাঁথা|তোশক|চাদর|লেপ,bedroom,not_rated,inherited,স. চতুস্কী >,no,yes,0
+N_f330f487fb,ছবির ফ্রেম,,picture frame,photo frame,সাজসজ্জার সামগ্রী,decoration,,,living room,globally_common,english,ই.,no,yes,14
+N_880c68b789,ছাঁকনি,ছাকুনি,strainer,,,,ঝুড়ি ও ছাঁকনি জাতীয়,ঝুড়ি|চালুনি|কুলা|ঝাঁঝরি|ডালা,kitchen,not_rated,inherited,বা.,no,no,4
+N_d448ac7cf7,ছুরি,,knife,kitchen knife|blade,কাটার যন্ত্র,cutting tool,কাটা ও বাটা,বটি|শিল-পাটা|হামানদিস্তা|দা|চাকু,kitchen,globally_common,inherited,স. ক্ষুরী >,no,yes,8
+N_27562c3fcc,ছোলনি,,skimmer,,রান্নার সরঞ্জাম,kitchen tool,,,kitchen,not_rated,inherited,বা. (looked up as ছোলানো),no,yes,0
+N_140e5ea0f7,জগ,,jug,,পাত্র,container,পানি ও পরিবেশনের পাত্র,বালতি|বোতল|মগ|কলস|গ্যালন,kitchen,globally_common,english,ই.,yes,yes,3
+N_772dcbc53a,জানালা,,window,,,,,,any,globally_common,other_loan,পো.,no,yes,11
+N_dc31f958ee,জানালার গ্রিল,গ্রিল,window grill,window grille|window bars|grill,,,,,any,globally_common,other_loan,ফ.,yes,yes,31
+N_559474d6b0,জায়নামাজ,,prayer mat,prayer carpet,মেঝের আচ্ছাদন,floor covering,মেঝের মাদুর / কার্পেট,পাপোশ|কার্পেট|মাদুর|শীতলপাটি,any,globally_common,other_loan,ফা.,no,yes,5
+N_9fd9daad02,জীবানুনাশক,,disinfectant,antiseptic liquid,পরিষ্কারক,cleaning product,,,bathroom,not_rated,uncertain,not found: জীবানুনাশক,no,yes,1
+N_9183688df6,জুতা,স্যান্ডেল,shoe,shoes|footwear|sandal,,,,,any,globally_common,other_loan,হি.,yes,yes,4
+N_d6b22da218,জুতো রাখার র্যাক,জুতা রাখার র্যাক|জুতার র্যাক,shoe rack,shoe stand|shoe shelf,তাক,shelf,,,living room,globally_common,english,ই. (looked up as র‍্যাক),no,yes,9
+N_acb42023b1,জেট স্প্রে,বিডে স্প্রে,bidet spray,health faucet|bidet sprayer|bidet,,,বাথরুমের কল / পানি ব্যবস্থা,বেসিন|কল|ঝরনা|সিংক|ওয়াটার হিটার|ঝরনার নব|বদনা,bathroom,globally_common,english,rule: modern English,yes,yes,11
+N_a172719566,ঝরনা,ঝর্না|শাওয়ার,shower,showerhead|shower head,,,বাথরুমের কল / পানি ব্যবস্থা,বেসিন|কল|জেট স্প্রে|সিংক|ওয়াটার হিটার|ঝরনার নব|বদনা,bathroom,globally_common,inherited,বা.,yes,yes,16
+N_368216e9f3,ঝরনার নব,ঝর্নার নব,shower knob,shower handle|shower control,,,বাথরুমের কল / পানি ব্যবস্থা,বেসিন|কল|ঝরনা|জেট স্প্রে|সিংক|ওয়াটার হিটার|বদনা,bathroom,globally_common,english,rule: modern English,no,yes,6
+N_c6815dffe0,ঝাঁঝরি,,colander,strainer,রান্নার সরঞ্জাম,kitchen tool,ঝুড়ি ও ছাঁকনি জাতীয়,ঝুড়ি|ছাঁকনি|চালুনি|কুলা|ডালা,kitchen,not_rated,inherited,স. ঝাঁঝরী >,no,no,0
+N_9fded42fcb,ঝাড়ু,ঝাড়ো,broom,,পরিষ্কারের সরঞ্জাম,cleaning tool,,,any,globally_common,other_loan,হি.,no,yes,2
+N_a71b383793,ঝুড়ি,বাস্কেট,basket,,পাত্র,container,ঝুড়ি ও ছাঁকনি জাতীয়,ছাঁকনি|চালুনি|কুলা|ঝাঁঝরি|ডালা,kitchen,globally_common,inherited,"মুন্ডা, ঝুরি >",yes,yes,5
+N_bd24d48665,টব,ফুলের টব|গাছের টব,plant pot,tub,পাত্র,container,টব / ফুলদানি,ফুলদানি,any,globally_common,english,ই. tub >,yes,yes,19
+N_d2e73f1058,টয়লেট ক্লিনার,টয়লেট ক্লিনার পাউডার,toilet cleaner,bathroom cleaner,পরিষ্কারক,cleaning product,,,bathroom,not_rated,english,rule: modern English,yes,yes,2
+N_4c3450ac9c,টি টেবিল,,tea table,coffee table|center table,টেবিল,table,টেবিলের ধরন (কাজ/অবস্থান দিয়ে আলাদা),পড়ার টেবিল|টেবিল|সাইড টেবিল|ড্রেসিং টেবিল|ডাইনিং টেবিল,living room,globally_common,english,ই.,yes,yes,8
+N_e08561fc70,টিউব লাইট,টিউবলাইট,tubelight,,বৈদ্যুতিক সরঞ্জাম,electrical equipment,,,any,globally_common,english,ই.,yes,yes,1
+N_e055885894,টিউব লাইট হোল্ডার,,tube light holder,,ধারক,holder,,,any,not_rated,english,rule: modern English,yes,yes,1
+N_4442da30f3,টিস্যু বক্স,,tissue box,napkin box,,,,,any,globally_common,english,ই. box > (looked up as বাক্স),yes,yes,3
+N_e8edfddf31,টিস্যু হোল্ডার,,tissue holder,tissue dispenser,,,,,any,globally_common,english,rule: modern English,yes,yes,4
+N_376b112f5c,টুথব্রাশ,,toothbrush,,ব্রাশ,brush,,,bathroom,globally_common,english,ই.,yes,yes,3
+N_b73974a589,টুল,নহ টুল,stool,,আসন,seat,নিচু বসার আসন,পিঁড়ি|মোড়া|প্লাস্টিকের মোড়া,living room,globally_common,english,ই. stool >,yes,yes,25
+N_9f5d811d75,টেবিল,,table,,,,টেবিলের ধরন (কাজ/অবস্থান দিয়ে আলাদা),পড়ার টেবিল|টি টেবিল|সাইড টেবিল|ড্রেসিং টেবিল|ডাইনিং টেবিল,bedroom,globally_common,english,ই.,yes,yes,13
+N_cb5a857de5,টেবিল ঘড়ি,,table clock,desk clock|alarm clock,ঘড়ি,clock,,,any,not_rated,inherited,স. ঘটিকা,no,yes,3
+N_b6a67b2f81,টেবিল ফ্যান,,table fan,desk fan,বৈদ্যুতিক যন্ত্র,electrical appliance,ফ্যানের ধরন,এক্সহস্ট ফ্যান|সিলিং ফ্যান|স্ট্যান্ড ফ্যান,any,globally_common,english,ই.,yes,yes,8
+N_4fcd872ba1,টেবিল ল্যাম্প,,table lamp,desk lamp|table light,,,,,bedroom,globally_common,english,ই. lamp,yes,yes,2
+N_8a43f60c17,টেলিভিশন,টিভি,television,tv|tv set|telly,বৈদ্যুতিক যন্ত্র,electrical appliance,,,living room,globally_common,english,ই.,yes,yes,18
+N_d20ddc5494,ট্রলি ব্যাগ,লাগেজ,trolley bag,luggage bag|rolling suitcase,ব্যাগ,bag,,,any,not_rated,english,ই.,yes,yes,3
+N_e48f2a96d8,ট্রাইপড,,tripod,,স্ট্যান্ড,stand,,,any,not_rated,english,rule: modern English,yes,yes,0
+N_f5c7182a0d,ট্রিমার,,trimmer,grooming trimmer|clipper,প্রসাধন সরঞ্জাম,grooming tool,,,bathroom,not_rated,english,rule: modern English,yes,yes,1
+N_a397e19af8,ডাইনিং টেবিল,খাবার টেবিল,dining table,dinner table,টেবিল,table,টেবিলের ধরন (কাজ/অবস্থান দিয়ে আলাদা),পড়ার টেবিল|টেবিল|টি টেবিল|সাইড টেবিল|ড্রেসিং টেবিল,living room,globally_common,english,ই.,yes,yes,1
+N_9ebce64050,ডাম্বেল,,dumbbell,weights,ব্যায়ামের সরঞ্জাম,exercise equipment,,,any,not_rated,english,ই.,yes,yes,1
+N_c7f7b26e63,ডাল ঘুটনি,ঘুটনি|ডাল খুটনি|ডাল ঘূটনি,lentil masher,,রান্নার সরঞ্জাম,kitchen utensil,,,kitchen,culturally_specific,inherited,দেশি. (looked up as ঘুঁটনি),no,yes,8
+N_8a5069d421,ডালা,,tray,,,,ঝুড়ি ও ছাঁকনি জাতীয়,ঝুড়ি|ছাঁকনি|চালুনি|কুলা|ঝাঁঝরি,kitchen,not_rated,inherited,দেশি.,no,yes,0
+N_1ab7adcc62,ডাস্টপ্যান,বেলচা|ভেলচা,dustpan,trash pan,পরিষ্কারের সরঞ্জাম,cleaning tool,,,any,not_rated,english,rule: modern English,yes,yes,3
+N_4a90ba6ede,ডিপ ফ্রিজ,,deep fridge,freezer|chest freezer|deep freezer,ফ্রিজ,fridge,,,kitchen,globally_common,english,ই.,yes,yes,20
+N_aa724ba6a2,ডিস্ট্রিবিউশন বোর্ড,সার্কিট ব্রেকার,distribution board,fuse box|electrical panel|circuit breaker,বৈদ্যুতিক সরঞ্জাম,electrical equipment,বৈদ্যুতিক সংযোগ,সুইচ বোর্ড|বৈদ্যুতিক সকেট|মাল্টিপ্লাগ|প্লাগ,any,globally_common,english,ই. board,yes,yes,10
+N_533d61af88,ড্রয়ার,,drawer,,,,,,bedroom,globally_common,english,ই.,yes,yes,6
+N_400aa1586b,ড্রাম,,drum,water drum|barrel,পাত্র,container,,,bathroom,not_rated,english,ই.,yes,yes,3
+N_d35c396564,ড্রেন,,drain,,,,,,bathroom,not_rated,english,ই. drain,yes,yes,0
+N_cc7398e69f,ড্রেসিং টেবিল,,dressing table,vanity|dresser|vanity table,টেবিল,table,টেবিলের ধরন (কাজ/অবস্থান দিয়ে আলাদা),পড়ার টেবিল|টেবিল|টি টেবিল|সাইড টেবিল|ডাইনিং টেবিল,bedroom,globally_common,english,ই.,yes,yes,6
+N_64ff78f07e,তাওয়া,,griddle,,রান্নার পাত্র,cookware,রান্নার পাত্র (পট/প্যান),কড়াই|হাঁড়ি|দেকচি|গামলা|পাতিল|কেটলি|প্রেশার কুকার,kitchen,not_rated,other_loan,ফা.,no,yes,2
+N_233615ee81,তাক,,shelf,,,,,,kitchen,globally_common,other_loan,আ.,no,yes,2
+N_9412912405,তোয়ালে,,towel,bath towel|washcloth,,,তোয়ালে জাতীয়,গামছা,bathroom,not_rated,other_loan,পো.,no,yes,1
+N_a0553d59ca,তোয়ালে ঝোলানোর রিং,তোয়ালে ঝুলানোর রিং|তোয়ালে রাখার রিং,towel ring,towel holder|towel hanger,,,,,bathroom,globally_common,english,rule: modern English,no,yes,3
+N_e88717b33d,তোশক,,mattress,bed mattress|foam mattress,বিছানার কাপড়,bedding,বিছানা ও বিছানার কাপড়,বিছানা|বালিশ|কোলবালিশ|কম্বল|কাঁথা|চাদর|চৌকি|লেপ,bedroom,not_rated,other_loan,ফা.,no,yes,1
+N_43a79a7c0a,থালা-বাসন রাখার র্যাক,,dish rack,dish drainer|plate rack|dish drying rack,,,,,kitchen,globally_common,english,ই. (looked up as র‍্যাক),no,yes,6
+N_304cc41e10,দরজা,,door,,,,,,any,globally_common,other_loan,ফা.,no,yes,72
+N_a7a1a78113,দরজার লক,তালা|ছিটকিনি,door lock,door latch,দরজার সরঞ্জাম,door hardware,,,any,not_rated,english,ই.,no,yes,9
+N_e0a17af6c7,দরজার হাতল,,door handle,door knob,দরজার সরঞ্জাম,door hardware,,,any,globally_common,inherited,বা.,no,yes,5
+N_d031ee8cfd,দা,,machete,cleaver,কাটার যন্ত্র,cutting tool,কাটা ও বাটা,বটি|ছুরি|শিল-পাটা|হামানদিস্তা|চাকু,kitchen,not_rated,inherited,স. দাত্র,no,yes,1
+N_bac54a62c2,দেকচি,,pot,cooking pot,রান্নার পাত্র,cookware,রান্নার পাত্র (পট/প্যান),কড়াই|হাঁড়ি|গামলা|তাওয়া|পাতিল|কেটলি|প্রেশার কুকার,kitchen,culturally_specific,other_loan,ফা. (looked up as ডেকচি),no,no,6
+N_7ff8e33823,দেয়াল ঘড়ি,দেয়া ঘড়ি|দেয়ালঘড়ি|ঘড়ি,wall clock,clock,,,,,any,globally_common,inherited,স. ঘটিকা >,no,yes,22
+N_c96dc0bdd4,দোলনা,,swing,,,,,,any,not_rated,inherited,স. দোলন,no,yes,0
+N_55e82175dd,দোলনা চেয়ার,রকিং চেয়ার,rocking chair,,,,,,living room,not_rated,english,ই.,yes,yes,2
+N_3cf101b43b,নেইল কাটার,,nail cutter,nail trimmer,,,,,any,not_rated,english,rule: modern English,yes,yes,2
+N_cd3c2a98e1,পড়ার টেবিল,,study table,desk|study desk,টেবিল,table,টেবিলের ধরন (কাজ/অবস্থান দিয়ে আলাদা),টেবিল|টি টেবিল|সাইড টেবিল|ড্রেসিং টেবিল|ডাইনিং টেবিল,bedroom,globally_common,english,ই.,no,yes,25
+N_3f63a26dad,পর্দা,,curtain,drape|drapes,,,,,any,globally_common,other_loan,ফা.,no,yes,44
+N_09c96c4641,পর্দার রড,,curtain rod,,,,,,any,globally_common,english,ই.,no,yes,2
+N_c009eaae40,পাওয়ার ব্যাংক,,power bank,portable charger,ইলেকট্রনিক যন্ত্র,electronic device,,,any,not_rated,other_loan,ফ.,yes,yes,1
+N_4148e14aad,পাখির বাসা,,birdhouse,,,,,,any,not_rated,inherited,স. বাস >,no,yes,1
+N_e634eba269,পাতিল,,pot,cooking pot,রান্নার পাত্র,cookware,রান্নার পাত্র (পট/প্যান),কড়াই|হাঁড়ি|দেকচি|গামলা|তাওয়া|কেটলি|প্রেশার কুকার,kitchen,globally_common,inherited,দেশি.,no,no,2
+N_146645a898,পাপোশ,পাপশ|পাপুশ,doormat,,মেঝের আচ্ছাদন,floor covering,মেঝের মাদুর / কার্পেট,জায়নামাজ|কার্পেট|মাদুর|শীতলপাটি,any,globally_common,other_loan,ফা.,no,yes,4
+N_24de83a4ae,পারফিউমের বোতল,পারফিউম,perfume bottle,perfume,বোতল,bottle,,,bedroom,not_rated,other_loan,পো.,yes,yes,3
+N_f45223ce02,পার্স,পারস|লেডিস পার্স,purse,ladies purse,ব্যাগ,bag,,,any,not_rated,english,rule: modern English,yes,yes,4
+N_c44c2fae7e,পিঁড়ি,,low wooden stool,,আসন,seat,নিচু বসার আসন,টুল|মোড়া|প্লাস্টিকের মোড়া,living room,not_rated,inherited,স. পীঠ >,no,yes,3
+N_14a9023e41,পিরিচ,পিরি|কাপ-পিরিচ,saucer,,প্লেট,plate,,,kitchen,not_rated,other_loan,পো.,no,yes,6
+N_a49289dc8a,প্রেশার কুকার,প্রেসার কুকার,pressure cooker,,রান্নার পাত্র,cooking pot,রান্নার পাত্র (পট/প্যান),কড়াই|হাঁড়ি|দেকচি|গামলা|তাওয়া|পাতিল|কেটলি,kitchen,not_rated,english,rule: modern English,yes,yes,0
+N_65113065a2,প্লাগ,,plug,electric plug,ইলেকট্রনিক যন্ত্র,electronic device,বৈদ্যুতিক সংযোগ,সুইচ বোর্ড|বৈদ্যুতিক সকেট|মাল্টিপ্লাগ|ডিস্ট্রিবিউশন বোর্ড,any,not_rated,other_loan,জ.,yes,yes,1
+N_d45b3ac033,প্লাস্টিকের ঝুড়ি,,plastic basket,plastic bin|plastic crate,,,,,any,not_rated,inherited,মুন্ডা. ঝুরি >,no,yes,0
+N_c8f7eba720,প্লাস্টিকের মোড়া,,plastic stool,plastic bench,আসন,seat,নিচু বসার আসন,টুল|পিঁড়ি|মোড়া,living room,not_rated,inherited,দেশি.,no,yes,0
+N_52a79199e7,প্লেট,থালা,plate,dish,,,,,kitchen,globally_common,english,ই. plate,yes,yes,6
+N_90067d77c2,ফার্স্ট এইড বক্স,,first aid kit,medical kit|emergency kit|medicine box|first aid box,বক্স,box,,,any,not_rated,english,rule: modern English,yes,yes,0
+N_89750df12a,ফিল্টার,,water filter,water purifier|filter,,,,,kitchen,globally_common,english,rule: modern English,yes,yes,22
+N_7790a302cf,ফুল,,flower,blossom|bloom,,,,,any,globally_common,inherited,স. ফুল্ল >,no,yes,5
+N_741c06f8be,ফুলদানি,,vase,flower vase,পাত্র,container,টব / ফুলদানি,টব,living room,globally_common,other_loan,ফা.,no,yes,24
+N_170c40fdee,ফেসওয়াশ,ফেস ওয়াশ,face wash,facial cleanser,ত্বকের যত্নের পণ্য,skincare product,,,bathroom,not_rated,english,rule: modern English,yes,yes,2
+N_93c3e0984b,ফ্যান,,fan,,,,,,any,globally_common,english,ই.,yes,yes,5
+N_945afa657a,ফ্যানের রেগুলেটর,,fan regulator,fan speed controller,,,,,any,not_rated,english,rule: modern English,no,yes,2
+N_89cfba1d81,ফ্রিজ,,fridge,refrigerator,গৃহস্থালি যন্ত্র,household appliance,,,kitchen,globally_common,english,ই.,yes,yes,50
+N_2c9db48d1f,ফ্লাশ ট্যাংক,ফ্ল্যাশ ট্যাঙ্ক,flush tank,toilet tank,,,,,bathroom,globally_common,other_loan,গুজ.,yes,yes,6
+N_467b56b59a,ফ্লোর ল্যাম্প,,floor lamp,,আলো,light,,,bedroom,globally_common,english,ই. lamp,yes,yes,3
+N_bd39d4b5ee,বইয়ের তাক,বুকশেলফ|বুলশেলফ|বুকসেলফ,bookshelf,bookcase,তাক,shelf,সংরক্ষণ-আসবাব (আলমারি/কেবিনেট/শোকেস),আলমারি|ওয়াল শোকেস|ওয়ারড্রব|কেবিনেট|শোকেস|কর্নার স্ট্যান্ড|কাবার্ড,any,globally_common,other_loan,আ.,yes,yes,16
+N_f5e5b7dddd,বক্স,বাক্স,box,,পাত্র,container,,,any,globally_common,english,ই. box > (looked up as বাক্স),yes,yes,4
+N_f7ce346a85,বটি,বঁটি,cutter,,কাটার যন্ত্র,cutting tool,কাটা ও বাটা,ছুরি|শিল-পাটা|হামানদিস্তা|দা|চাকু,kitchen,culturally_specific,inherited,"মুন্ডা, বইনটি >",no,yes,15
+N_fe02dba1a6,বডি ওয়াশ,,bodywash,shower gel|bath gel,ত্বকের যত্নের পণ্য,skincare product,,,bathroom,not_rated,english,rule: modern English,yes,yes,1
+N_078c3ad3ea,বদনা,,lota,,পাত্র,container,বাথরুমের কল / পানি ব্যবস্থা,বেসিন|কল|ঝরনা|জেট স্প্রে|সিংক|ওয়াটার হিটার|ঝরনার নব,bathroom,culturally_specific,inherited,স. বর্ধনী >,no,yes,5
+N_5cc9f99379,বয়াম,বয়ম,jar,,পাত্র,container,ছোট কৌটা / জার,মসলার কৌটা|কৌটা,kitchen,globally_common,other_loan,পো. boiao >,no,no,12
+N_7cb50eabbd,বাটি,,bowl,small bowl,পাত্র,container,,,kitchen,globally_common,inherited,দেশি.,no,no,9
+N_df34b74d6e,বাথরুম র্যাক,,bathroom rack,shower caddy|bathroom shelf,র্যাক,rack,,,bathroom,not_rated,english,ই. (looked up as র‍্যাক),yes,yes,3
+N_1a765278b6,বালতি,,bucket,pail,পাত্র,container,পানি ও পরিবেশনের পাত্র,বোতল|মগ|কলস|জগ|গ্যালন,bathroom,globally_common,other_loan,পো.,no,yes,18
+N_dd3db984a3,বালিশ,,pillow,,বিছানার সামগ্রী,bedding,বিছানা ও বিছানার কাপড়,বিছানা|কোলবালিশ|কম্বল|কাঁথা|তোশক|চাদর|চৌকি|লেপ,bedroom,globally_common,other_loan,ফা.,no,yes,7
+N_e43ecaadfd,বাল্ব,বাতি,bulb,,বৈদ্যুতিক সরঞ্জাম,electrical equipment,,,any,globally_common,english,ই. bulb >,yes,yes,12
+N_02d46bc3d3,বাল্বের হোল্ডার,বাল্ব হোল্ডার,light socket,bulb socket|light bulb holder|bulb holder,ধারক,holder,,,any,not_rated,english,rule: modern English,yes,yes,2
+N_419b3ed555,বিছানা,বিচানা|খাট,bed,,আসবাব,furniture,বিছানা ও বিছানার কাপড়,বালিশ|কোলবালিশ|কম্বল|কাঁথা|তোশক|চাদর|চৌকি|লেপ,bedroom,globally_common,inherited,স. বিস্তারণা >,no,yes,31
+N_b2657fe1f9,বিন ব্যাগ চেয়ার,,bean bag chair,bean bag|beanbag chair,আসন,seat,,,living room,not_rated,english,ই.,yes,yes,1
+N_0cc0511e7d,বেল্ট,,belt,waist belt,পোশাকের আনুষঙ্গিক,clothing accessory,,,any,not_rated,english,ই.,yes,yes,1
+N_1b235df5f5,বেসিন,,basin,washbasin|wash basin,,,বাথরুমের কল / পানি ব্যবস্থা,কল|ঝরনা|জেট স্প্রে|সিংক|ওয়াটার হিটার|ঝরনার নব|বদনা,bathroom,globally_common,english,ই. basin,yes,yes,19
+N_dbbd2700c3,বৈদ্যুতিক সকেট,সকেট|সকেট বোর্ড,electrical socket,socket|power socket|wall socket|power outlet|outlet,বৈদ্যুতিক সরঞ্জাম,electrical equipment,বৈদ্যুতিক সংযোগ,সুইচ বোর্ড|মাল্টিপ্লাগ|ডিস্ট্রিবিউশন বোর্ড|প্লাগ,any,globally_common,english,rule: modern English,yes,yes,14
+N_28857ff50c,বোতল,পানির বোতল,bottle,,,,পানি ও পরিবেশনের পাত্র,বালতি|মগ|কলস|জগ|গ্যালন,any,globally_common,other_loan,পো.,yes,yes,7
+N_9973b18e2c,ব্যাগ,,bag,pouch,,,,,any,globally_common,english,ই.,yes,yes,2
+N_d0483bec66,ব্লেন্ডার,,blender,mixer,বৈদ্যুতিক যন্ত্র,electrical appliance,,,kitchen,globally_common,english,rule: modern English,yes,yes,6
+N_a564186fd8,মগ,,mug,,পাত্র,container,পানি ও পরিবেশনের পাত্র,বালতি|বোতল|কলস|জগ|গ্যালন,any,globally_common,other_loan,স্ক্যা.,yes,yes,5
+N_a95e6f40a2,মনিটর,,monitor,computer monitor|screen|display,ইলেকট্রনিক যন্ত্র,electronic device,,,bedroom,globally_common,english,rule: modern English,yes,yes,5
+N_bf0df28ac4,মপ,ঘর মুছার লাঠি|মব|ঘর মোছার লাঠি,mop,cleaning mop|floor mop,পরিষ্কারের সরঞ্জাম,cleaning tool,,,bathroom,not_rated,english,rule: modern English,yes,yes,5
+N_80ac289fb2,ময়লার ঝুড়ি,ডাস্ট বিন|ময়লা ঝুড়ি|ডাস্টবিন|ময়লার বালতি,dustbin,waste bin|trash,পাত্র,container,,,any,globally_common,inherited,মুন্ডা. ঝুরি >,yes,yes,11
+N_ff7586eb1b,মশা তাড়ানোর মেশিন,মশা তাড়ানোর যন্ত্র,mosquito repellent,,মশা নিয়ন্ত্রণ পণ্য,mosquito control product,,,any,not_rated,english,ই. machine,no,yes,2
+N_2657e92802,মশা মারার ব্যাট,মশার ব্যাট|মশা মারার বেট,mosquito racket,mosquito bat,ইলেকট্রনিক যন্ত্র,electronic device,,,any,not_rated,other_loan,লা.,no,yes,3
+N_e78546fab9,মশারি,,mosquito net,bed net,বিছানার সামগ্রী,bedding,,,bedroom,globally_common,inherited,স. মশহরী >,no,yes,2
+N_34dc8c0ced,মসলার কৌটা,,spice jar,masala box|spice container,,,ছোট কৌটা / জার,বয়াম|কৌটা,kitchen,globally_common,inherited,দেশি.,no,yes,5
+N_03a2592e94,মাউস,,mouse,,ইলেকট্রনিক যন্ত্র,electronic device,,,bedroom,globally_common,english,ই.,yes,yes,7
+N_012830ea3b,মাটির চুলা,,clay stove,mud stove|traditional stove,চুলা,stove,চুলার ধরন,গ্যাসের চুলা|ইলেকট্রিক চুলা|চুলা,kitchen,not_rated,inherited,স. চুল্লি >,no,yes,0
+N_37bdbbd162,মাটির ব্যাংক,টাকা জমানোর ব্যাংক,piggy bank,money box|coin bank|clay piggy bank,,,,,any,not_rated,other_loan,ফ.,no,yes,3
+N_2bd56414f7,মাড় গালার স্ট্যান্ড,,stand,,রান্নার সরঞ্জাম,kitchen utensil,,,kitchen,culturally_specific,english,ই.,no,yes,5
+N_394be10a79,মাদুর,,mat,rug|floor carpet,মেঝের আচ্ছাদন,floor covering,মেঝের মাদুর / কার্পেট,জায়নামাজ|পাপোশ|কার্পেট|শীতলপাটি,living room,not_rated,inherited,স. মন্দুরা >,no,no,0
+N_85bcce243b,মাল্টিপ্লাগ,মাল্টি-প্লাগ,multiplug,extension cord|extension board|multi plug,বৈদ্যুতিক সরঞ্জাম,electrical equipment,বৈদ্যুতিক সংযোগ,সুইচ বোর্ড|বৈদ্যুতিক সকেট|ডিস্ট্রিবিউশন বোর্ড|প্লাগ,any,globally_common,english,rule: modern English,yes,yes,13
+N_a5d78812a7,মিরসিব,মিরসিপ|কিচেন শেলফ,kitchen cabinet,kitchen shelf,আসবাব,furniture,,,kitchen,not_rated,uncertain,not found: মিরসিব,yes,yes,4
+N_658d297b81,মোড়া,,cane stool,rattan stool,আসন,seat,নিচু বসার আসন,টুল|পিঁড়ি|প্লাস্টিকের মোড়া,living room,not_rated,inherited,দেশি.,no,yes,1
+N_b46fc3f36b,মোবাইল ফোন,,mobile phone,smartphone|cell phone,,,,,any,not_rated,other_loan,গ্রি.,yes,yes,0
+N_232766ce1d,মোবাইল স্ট্যান্ড,,mobile stand,phone stand|phone holder,স্ট্যান্ড,stand,,,any,not_rated,english,ই.,yes,yes,1
+N_bf23e49159,রাইস কুকার,রাইস কোকার|রাইস কোঁকার,rice cooker,,রান্নার যন্ত্র,cooking appliance,,,kitchen,globally_common,english,rule: modern English,yes,yes,10
+N_a74c68aa9e,রাউটার,রউটার,router,wifi router,ইলেকট্রনিক যন্ত্র,electronic device,,,any,globally_common,english,rule: modern English,yes,yes,18
+N_fce035c8c4,রিমোট,,remote,,,,,,any,globally_common,english,ই.,yes,yes,10
+N_71c1f57a71,রুটি প্রেস,,roti press,roti maker|puri press,রান্নার সরঞ্জাম,kitchen tool,,,kitchen,not_rated,english,ই.,yes,yes,0
+N_aa9912eb3c,রেলিং,,railing,handrail|banister,,,,,any,globally_common,english,ই.,yes,yes,11
+N_cb18f23265,র্যাক,,rack,,,,,,any,globally_common,english,ই. (looked up as র‍্যাক),yes,yes,26
+N_d551600a03,লাইট,,light,,,,,,any,not_rated,english,ই.,yes,yes,3
+N_514fe9975f,লিফট,,elevator,lift,,,,,any,globally_common,english,ই.,yes,yes,5
+N_e23b7466f7,লিফটের বোতাম,,elevator button,lift button|elevator switch,,,,,any,not_rated,other_loan,পো.,no,yes,1
+N_37a662f047,লেপ,,quilt,blanket,বিছানার কাপড়,bedding,বিছানা ও বিছানার কাপড়,বিছানা|বালিশ|কোলবালিশ|কম্বল|কাঁথা|তোশক|চাদর|চৌকি,bedroom,not_rated,other_loan,আ. লিহাফ >,no,no,0
+N_460e987954,ল্যাপটপ,,laptop,,ইলেকট্রনিক যন্ত্র,electronic device,,,bedroom,globally_common,english,ই.,yes,yes,6
+N_0b54a32a04,ল্যাপটপ টেবিল,,laptop table,laptop desk,টেবিল,table,,,bedroom,globally_common,english,ই.,yes,yes,3
+N_4eb10c08d8,ল্যাম্প,,lamp,,,,,,any,not_rated,english,ই. lamp,yes,yes,0
+N_b6ba68c902,শলার ঝাড়ু,,stick broom,grass broom,ঝাড়ু,broom,,,any,not_rated,other_loan,হি.,no,yes,1
+N_054551fb7c,শিল-পাটা,পাটা|শিল,slab and muller,grinding stone|stone grinder,বাটার সরঞ্জাম,grinding tool,কাটা ও বাটা,বটি|ছুরি|হামানদিস্তা|দা|চাকু,kitchen,not_rated,inherited,বা.,no,yes,8
+N_fc1f87d07c,শীতলপাটি,,cool mat,floor mat|rug,মেঝের আচ্ছাদন,floor covering,মেঝের মাদুর / কার্পেট,জায়নামাজ|পাপোশ|কার্পেট|মাদুর,living room,not_rated,inherited,"স. শীতল+বা, পাটি",no,no,0
+N_df3a65556a,শো-পিস,শোপিস|সো-পিস,showpiece,ornament|decorative item,সাজসজ্জার সামগ্রী,decoration,,,any,globally_common,english,rule: modern English,yes,yes,35
+N_ba8f6c7293,শোকেস,,showcase,display case,আসবাব,furniture,সংরক্ষণ-আসবাব (আলমারি/কেবিনেট/শোকেস),আলমারি|ওয়াল শোকেস|ওয়ারড্রব|বইয়ের তাক|কেবিনেট|কর্নার স্ট্যান্ড|কাবার্ড,living room,globally_common,english,rule: modern English,yes,yes,9
+N_617b12f73d,শ্যাম্পু,,shampoo,,চুলের যত্নের পণ্য,hair care product,,,bathroom,not_rated,other_loan,হি.,yes,yes,3
+N_7415cac4d8,সসের বোতল,,sauce bottle,ketchup bottle|sauce dispenser,বোতল,bottle,,,kitchen,not_rated,other_loan,পো.,no,yes,0
+N_b094ff9c82,সাইড টেবিল,,side table,end table,টেবিল,table,টেবিলের ধরন (কাজ/অবস্থান দিয়ে আলাদা),পড়ার টেবিল|টেবিল|টি টেবিল|ড্রেসিং টেবিল|ডাইনিং টেবিল,bedroom,globally_common,english,ই.,yes,yes,8
+N_c6750d6821,সাউন্ড বক্স,স্পিকার,speaker,sound box|loudspeaker,ইলেকট্রনিক যন্ত্র,electronic device,,,any,not_rated,english,ই. box > (looked up as বাক্স),yes,yes,3
+N_379eb54b55,সাবানদানি,সাবান দানি,soap dish,soap case|soap tray,ধারক,holder,,,bathroom,globally_common,other_loan,ফা.,no,yes,10
+N_553980b3dc,সিঁড়ি,,stairs,steps,,,,,any,globally_common,inherited,স. শ্রেঢী,no,yes,0
+N_ae2825ac36,সিংক,সিঙ্ক,sink,kitchen sink,,,বাথরুমের কল / পানি ব্যবস্থা,বেসিন|কল|ঝরনা|জেট স্প্রে|ওয়াটার হিটার|ঝরনার নব|বদনা,kitchen,globally_common,english,rule: modern English,yes,yes,9
+N_9fd800ef0f,সিডি,,cd,compact disc,ডিস্ক,disc,,,bedroom,globally_common,english,ই.,yes,yes,3
+N_db6647ee48,সিপিইউ,,cpu,,,,,,bedroom,globally_common,english,rule: modern English,yes,yes,4
+N_c84f4e8058,সিলিং ফ্যান,,ceiling fan,,বৈদ্যুতিক যন্ত্র,electrical appliance,ফ্যানের ধরন,এক্সহস্ট ফ্যান|টেবিল ফ্যান|স্ট্যান্ড ফ্যান,any,globally_common,english,ই.,yes,yes,15
+N_7d90e00018,সিলিন্ডার,গ্যাসের সিলিন্ডার|গ্যাস সিলিন্ডার,cylinder,,পাত্র,container,,,kitchen,not_rated,english,rule: modern English,yes,yes,5
+N_e006f4a443,সুইচ বোর্ড,সইচ বোর্ড|সুইচবোর্ড,switchboard,,বৈদ্যুতিক সরঞ্জাম,electrical equipment,বৈদ্যুতিক সংযোগ,বৈদ্যুতিক সকেট|মাল্টিপ্লাগ|ডিস্ট্রিবিউশন বোর্ড|প্লাগ,any,globally_common,english,ই. board,yes,yes,55
+N_07cc0e0d45,সেলাই মেশিন,শেলায় মেশিন|সেলাই মেসিন,sewing machine,,যন্ত্র,machine,,,any,not_rated,english,ই. machine,no,yes,4
+N_3cd48a61db,সোফা,,sofa,couch,আসন,seat,,,living room,globally_common,other_loan,ফ.,yes,yes,33
+N_31a0bdde66,স্কুল ব্যাগ,,school bag,backpack,ব্যাগ,bag,,,any,globally_common,english,ই.,yes,yes,6
+N_f29daf73ee,স্ট্যান্ড ফ্যান,,stand fan,pedestal fan|floor fan,বৈদ্যুতিক যন্ত্র,electrical appliance,ফ্যানের ধরন,এক্সহস্ট ফ্যান|সিলিং ফ্যান|টেবিল ফ্যান,any,globally_common,english,ই.,yes,yes,3
+N_5c1e305d13,হটপট,হট বক্স,hotpot,,পাত্র,container,,,kitchen,globally_common,english,rule: modern English,yes,yes,7
+N_e164d177c4,হাঁড়ি,,pot,cooking pot,রান্নার পাত্র,cookware,রান্নার পাত্র (পট/প্যান),কড়াই|দেকচি|গামলা|তাওয়া|পাতিল|কেটলি|প্রেশার কুকার,kitchen,ambiguous,inherited,বা.,no,no,8
+N_2fdd6246ff,হাতঘড়ি,হাত ঘড়ি,wrist watch,hand watch,ঘড়ি,clock,,,any,not_rated,inherited,স. ঘটিকা >,no,yes,1
+N_89724dc6f8,হামানদিস্তা,,mortar pestle,pestle and mortar,বাটার সরঞ্জাম,grinding tool,কাটা ও বাটা,বটি|ছুরি|শিল-পাটা|দা|চাকু,kitchen,not_rated,other_loan,ফা.,no,yes,2
+N_eb7920ce67,হেয়ার ড্রায়ার,,hair dryer,,বৈদ্যুতিক যন্ত্র,electrical appliance,,,any,not_rated,english,ই. (looked up as ড্রায়ার),yes,yes,1
+N_8723541033,হেলমেট,,helmet,,সুরক্ষা সরঞ্জাম,protective gear,,,any,not_rated,english,rule: modern English,yes,yes,0
+N_450d3a59cd,হ্যাঙ্গার,কাপড় ঝোলানোর হ্যাঙ্গার,hanger,plastic hanger|wooden hanger|wire hanger,,,,,bedroom,globally_common,english,rule: modern English,yes,no,4
+N_e9f4c68e87,হ্যান্ড ওয়াশ,হ্যান্ডওয়াশ,hand soap,hand wash|liquid hand soap,,,,,bathroom,globally_common,english,rule: modern English,yes,yes,8
+N_39dd8ba9bd,হ্যান্ডব্যাগ,হাতব্যাগ,handbag,shoulder bag,ব্যাগ,bag,,,bedroom,not_rated,english,rule: modern English,yes,yes,2
