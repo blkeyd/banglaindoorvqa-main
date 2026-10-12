@@ -3,3 +3,11 @@ H05_0110_q1,P-CORE-CLOSED,obj_name,gold_not_one_object,is_name = no,gate-A
 H35_0041_q1,R-TEST,obj_name,gold_not_one_object,is_name = no,gate-A
 H35_0045_q3,R-TEST,obj_property,gold_wrong_kind,manual,gate-A
 H38_0006_q1,P-CORE-CLOSED|R-TEST,obj_name,gold_not_one_object,is_name = no,gate-A
+H13_0089_q2,P-CORE-CLOSED,object,other,bn_question_leaks.csv,ASSET-2 stage 4
+H14_0085_q2,R-TEST,object,other,bn_question_leaks.csv,ASSET-2 stage 4
+H14_0031_q2,R-TEST,object,other,stage 4 leak scan,ASSET-2 stage 4
+H14_0046_q2,R-TEST,object,other,stage 4 leak scan,ASSET-2 stage 4
+H14_0053_q2,R-TEST,object,other,stage 4 leak scan,ASSET-2 stage 4
+H14_0075_q2,R-TEST,object,other,stage 4 leak scan,ASSET-2 stage 4
+H14_0076_q2,R-TEST,object,other,stage 4 leak scan,ASSET-2 stage 4
+H36_0081_q2,P-CORE-CLOSED,object,other,stage 4 leak scan,ASSET-2 stage 4
