@@ -13,3 +13,8 @@ H14_0076_q2,R-TEST,object,other,stage 4 leak scan,ASSET-2 stage 4
 H36_0081_q2,P-CORE-CLOSED,object,other,stage 4 leak scan,ASSET-2 stage 4
 H35_0016_q2,R-TEST,object,other,stage 4 leak scan,ASSET-2 stage 4
 H53_0021_q2,R-TEST,object,other,stage 4 leak scan,ASSET-2 stage 4
+H68_0023_q2,P-CORE-CLOSED,object,gold_wrong,Pilot image check,Pilot
+H02_0037_q2,P-CORE-CLOSED,object,other,Pilot: question refers to the annotation mark,Pilot
+H13_0005_q2,P-CORE-CLOSED,object,other,Pilot: question refers to the annotation mark,Pilot
+H13_0050_q2,P-CORE-CLOSED,object,other,Pilot: question refers to the annotation mark,Pilot
+H14_0044_q2,R-TEST,object,other,Pilot: question refers to the annotation mark,Pilot
