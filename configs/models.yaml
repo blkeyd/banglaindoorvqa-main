@@ -42,8 +42,8 @@ models:
     backend: hf
     family: qwen3_5
     model_id: Qwen/Qwen3.5-4B           # Design 5.1
-    revision: null                      # null: the newest commit is resolved at the first run of a stage and then fixed.
-                                        # Paste the printed commit hash here before Gate E.
+    revision: "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a"   # D155: the smoke-run and Gate G commit, pinned
+                                        # before the pilot. A newer commit needs a decision row and a new FT dry run.
     enable_thinking: false              # Design 5.2
     max_new_tokens: 32                  # Design 5.2
     max_pixels: 786432                  # Design 5.2: 1,024 x 768
@@ -53,7 +53,7 @@ models:
     backend: hf
     family: gemma4
     model_id: google/gemma-4-E4B-it     # Design 5.1
-    revision: null
+    revision: "ee0ef6023621cff504d758262d4e04895a5af4a2"   # D155: the smoke-run commit (run t2), pinned before the pilot
     enable_thinking: false              # Design 5.2: thinking off
     max_new_tokens: 32
     max_pixels: null
