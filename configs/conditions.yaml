@@ -40,7 +40,7 @@ probes:
   P-CORE-CLOSED: {file: P-CORE-CLOSED.json, expected_n: 1118}
   P-NAME:        {file: P-NAME.json,        expected_n: 1000}
   P-CLUST:       {file: P-CLUST.json,       expected_n: 492}
-  P-FCE:         {file: null,               expected_n: null}   # written by ASSET-11 after Gate A
+  P-FCE:         {file: P-FCE.json,         expected_n: 454}    # written by ASSET-11 after HT-6 (Design 4.7)
   R-TEST:        {file: R-TEST.json,        expected_n: 1449}
   PILOT:         {file: PILOT.json,         expected_n: 100}
   P-CORE:        {file: P-CORE.json,        expected_n: 2040}   # harness tests only
