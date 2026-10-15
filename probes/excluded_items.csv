@@ -18,3 +18,12 @@ H02_0037_q2,P-CORE-CLOSED,object,other,Pilot: question refers to the annotation 
 H13_0005_q2,P-CORE-CLOSED,object,other,Pilot: question refers to the annotation mark,Pilot
 H13_0050_q2,P-CORE-CLOSED,object,other,Pilot: question refers to the annotation mark,Pilot
 H14_0044_q2,R-TEST,object,other,Pilot: question refers to the annotation mark,Pilot
+H20_0058_q1,P-NAME|P-CLUST|P-FCE,obj_name,gold_wrong,HT-6 review,ASSET-11
+H28_0069_q1,PILOT|P-NAME|P-CLUST|P-FCE,obj_name,gold_wrong,HT-6 review,ASSET-11
+H54_0006_q1,R-TEST|P-NAME|P-CLUST|P-FCE|NAME-REF,obj_name,gold_wrong,HT-6 review,ASSET-11
+H05_0104_q1,P-NAME|P-CLUST|P-FCE,obj_name,gold_wrong,HT-6 review,ASSET-11
+H58_0020_q1,P-NAME|P-CLUST|P-FCE,obj_name,gold_wrong,HT-6 review,ASSET-11
+H17_0010_q1,P-NAME|P-CLUST|P-FCE,obj_name,gold_wrong,HT-6 review,ASSET-11
+H25_0012_q1,P-CORE-CLOSED|R-TEST|P-NAME|P-CLUST|P-FCE,obj_name,gold_wrong,HT-6 review,ASSET-11
+H21_0021_q1,P-NAME|P-CLUST,obj_name,gold_wrong,HT-6 review,ASSET-11
+H51_0047_q1,P-NAME|P-CLUST|P-FCE,obj_name,gold_wrong,HT-6 review,ASSET-11
