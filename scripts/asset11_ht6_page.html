@@ -1,0 +1,680 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>HT-6 option review</title>
+<style>
+:root{
+  --paper:#f2f4f3; --card:#ffffff; --ink:#14201b; --soft:#56625c; --line:#d3d9d6;
+  --right:#145c3c; --right-bg:#e4f1e9; --gone:#9c2a1e; --gone-bg:#fbe9e6;
+  --new:#6f4500; --new-bg:#fff0c9; --focus:#1747c9; --photo:#111715;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+.bn{font-family:"Noto Sans Bengali","Nirmala UI","Kohinoor Bangla","Bangla Sangam MN",
+  "Hind Siliguri","SolaimanLipi","Vrinda",system-ui,sans-serif}
+button{font:inherit;color:inherit;background:var(--card);border:1px solid var(--line);
+  border-radius:6px;padding:7px 12px;cursor:pointer}
+button:hover{border-color:var(--soft)}
+button:focus-visible,input:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+#app{display:grid;grid-template-rows:auto minmax(0,1fr);height:100%}
+.bar{display:flex;align-items:center;gap:18px;padding:10px 16px;background:var(--card);
+  border-bottom:1px solid var(--line)}
+.bar h1{font-size:16px;font-weight:650;margin:0;white-space:nowrap}
+.progress{flex:1;display:flex;align-items:center;gap:12px;min-width:0}
+.meter{flex:1;max-width:380px;height:8px;background:var(--line);border-radius:4px;overflow:hidden}
+.meter span{display:block;height:100%;width:0;background:var(--right)}
+#counts{color:var(--soft);white-space:nowrap;font-variant-numeric:tabular-nums}
+.tools{display:flex;gap:8px}
+.tools .keep{background:var(--ink);color:#fff;border-color:var(--ink)}
+main{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(400px,.8fr);min-height:0}
+.photo{background:var(--photo);display:flex;align-items:center;justify-content:center;
+  min-height:0;min-width:0;padding:12px}
+.photo img{width:100%;height:100%;object-fit:contain}
+.photo p{color:#c9d2ce;max-width:34ch;text-align:center}
+.panel{overflow:auto;padding:16px 22px 22px;min-height:0}
+.where{display:flex;flex-wrap:wrap;gap:4px 14px;align-items:baseline;margin:0 0 6px;color:var(--soft)}
+.where strong{color:var(--ink);font-weight:650}
+.where code{font:13px ui-monospace,Menlo,Consolas,monospace}
+.question{font-size:20px;line-height:1.5;margin:0 0 12px}
+.opts{list-style:none;margin:0;padding:0}
+.opt{background:var(--card);border:1px solid var(--line);border-left:6px solid var(--line);
+  border-radius:6px;padding:9px 14px 10px;margin:0 0 8px}
+.opt.is-right{border-left-color:var(--right);background:var(--right-bg)}
+.opt.is-new{border-left-color:var(--new);background:var(--new-bg)}
+.names{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 14px}
+.names .bn{font-size:27px;font-weight:600;line-height:1.35}
+.names .en{font-size:16px;color:var(--soft)}
+.meta{margin:2px 0 0;font-size:13px;color:var(--soft)}
+.is-right .meta{color:var(--right);font-weight:600}
+.meta .written{display:block;font-weight:400}
+.is-new .meta b{color:var(--new)}
+.meta .look{display:block;color:var(--gone);font-weight:600}
+.meta .bn,.removed .bn{font-size:17px;line-height:1.2}
+.removed .bn{font-weight:600}
+.act{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.act button{font-size:13px;padding:5px 10px}
+.act button:hover{border-color:var(--gone);color:var(--gone)}
+.removed{border:1px dashed var(--gone);background:var(--gone-bg);border-radius:6px;
+  padding:8px 12px;margin:0 0 10px}
+.removed p{margin:0 0 4px;display:flex;flex-wrap:wrap;gap:6px 10px;align-items:baseline}
+.removed p:last-child{margin-bottom:0}
+.removed button{font-size:13px;padding:3px 9px}
+.only-bn{margin:0 0 10px;font-size:13px;color:var(--soft)}
+.note{display:block;margin:12px 0 6px;font-size:13px;color:var(--soft)}
+.note input{display:block;width:100%;margin-top:4px;font:inherit;color:var(--ink);padding:8px 10px;
+  border:1px solid var(--line);border-radius:6px;background:var(--card)}
+.flag{display:flex;gap:8px;align-items:flex-start;font-size:14px;margin:8px 0 0}
+.flag input{margin-top:3px}
+.state{margin:12px 0 8px;min-height:1.45em;font-weight:600}
+.state.warn{color:var(--gone)}
+.go{display:flex;gap:8px;align-items:center}
+.go .ok{margin-left:auto;background:var(--right);border-color:var(--right);color:#fff;
+  font-weight:650;font-size:16px;padding:12px 18px}
+.go .ok:hover{filter:brightness(1.08)}
+.keys{margin:10px 0 0;font-size:13px;color:var(--soft)}
+kbd{font:12px ui-monospace,Menlo,Consolas,monospace;border:1px solid var(--line);
+  border-bottom-width:2px;border-radius:4px;padding:1px 5px;background:var(--card)}
+.cover{position:fixed;inset:0;z-index:10;background:rgba(17,23,21,.78);display:flex;
+  align-items:center;justify-content:center;padding:20px}
+.sheet{background:var(--card);border-radius:10px;width:100%;max-width:660px;max-height:92vh;
+  overflow:auto;padding:26px 30px}
+.sheet h2{margin:0 0 10px;font-size:22px;line-height:1.25}
+.sheet p,.sheet li{max-width:62ch}
+.sheet ul{padding-left:20px;margin:8px 0}
+.sheet li{margin:4px 0}
+.sheet label{display:block;margin:16px 0 6px;font-weight:600}
+.sheet input[type=text]{font:inherit;padding:9px 11px;border:1px solid var(--line);
+  border-radius:6px;width:14ch}
+.sheet .row{display:flex;gap:10px;align-items:center;margin-top:18px}
+.sheet .ok{background:var(--right);border-color:var(--right);color:#fff;font-weight:650;
+  padding:11px 18px}
+.small{font-size:13px;color:var(--soft)}
+.bad{color:var(--gone);font-weight:600}
+@media (max-width:900px){
+  #app{height:auto}
+  main{grid-template-columns:1fr}
+  .photo{height:52vh}
+  .bar{flex-wrap:wrap}
+  .progress{order:3;flex-basis:100%}
+}
+</style>
+</head>
+<body>
+<div id="app" hidden>
+  <header class="bar">
+    <h1>HT-6 option review</h1>
+    <div class="progress">
+      <div class="meter" aria-hidden="true"><span id="meter"></span></div>
+      <span id="counts"></span>
+    </div>
+    <div class="tools">
+      <button type="button" id="btnRules">Rules</button>
+      <button type="button" id="btnLoad">Load a saved log</button>
+      <button type="button" id="btnSave" class="keep">Download the log</button>
+      <input type="file" id="fileIn" accept=".csv,text/csv" hidden>
+    </div>
+  </header>
+  <main>
+    <section class="photo" aria-label="Picture of this set">
+      <img id="photo" alt="Picture of this set">
+      <p id="nophoto" hidden>This is a test sheet without pictures. It cannot be used for the review.</p>
+    </section>
+    <section class="panel">
+      <p class="where"><strong id="setNo"></strong><span id="group" class="bn" lang="bn"></span><code id="qa"></code></p>
+      <p class="question bn" id="question" lang="bn"></p>
+      <p class="only-bn" id="onlyBn" hidden>Bangla only: this set is never shown in English, so no English names are listed.</p>
+      <ol class="opts" id="opts"></ol>
+      <div class="removed" id="removed" hidden></div>
+      <label class="note">Note (needed for "other reason" and for the tick box below)
+        <input type="text" id="note" maxlength="300" autocomplete="off">
+      </label>
+      <label class="flag"><input type="checkbox" id="flag">
+        <span>Something else is wrong here: the right answer does not fit, or the picture is unclear. Tell the team lead.</span></label>
+      <p class="state" id="state" role="status" aria-live="polite"></p>
+      <div class="go">
+        <button type="button" id="btnPrev">Back</button>
+        <button type="button" id="btnSkip">Skip for now</button>
+        <button type="button" id="btnOk" class="ok"></button>
+      </div>
+      <p class="keys"><kbd>Enter</kbd> confirms this set and opens the next one. <kbd>&larr;</kbd> and <kbd>&rarr;</kbd> move without confirming.</p>
+    </section>
+  </main>
+</div>
+
+<div class="cover" id="start" hidden>
+  <div class="sheet">
+    <h2 id="startTitle"></h2>
+    <p>Each set has a picture, one right answer and three wrong answers. A model will see the picture and the four names and must pick one. You check that none of the three wrong answers is also right.</p>
+    <p>Take a wrong answer out in two cases only:</p>
+    <ul>
+      <li>It is also a right name for the main thing in the picture.</li>
+      <li>The thing it names is also a main object of the picture: as large and as central as the right answer.</li>
+    </ul>
+    <p>Leave it in when the thing is not in the picture, or is small, at the edge or in the background. When you take one out, the next candidate appears in its place. Check that one too.</p>
+    <p class="small" id="startSaved"></p>
+    <label for="who">Your initials</label>
+    <input type="text" id="who" maxlength="12" autocomplete="off">
+    <p class="bad" id="startMsg" hidden>Type your initials first.</p>
+    <div class="row"><button type="button" id="btnStart" class="ok"></button></div>
+    <p class="small">This file holds photos of homes with their names. Keep it on your own computer and do not share it. Delete it after you upload the log.</p>
+  </div>
+</div>
+
+<div class="cover" id="rules" hidden>
+  <div class="sheet">
+    <h2>Rules for this review</h2>
+    <ul>
+      <li>The first row is the right answer. Never change it.</li>
+      <li>Take a wrong answer out if it is also a right name for the main thing in the picture, in Bangla or in English.</li>
+      <li>Take a wrong answer out if the thing it names is also a main object of the picture: as large and as central as the right answer.</li>
+      <li>Leave a wrong answer in if the thing is absent, small, at the edge or in the background.</li>
+      <li>Leave a wrong answer in if the two names are only close in meaning in general. Decide from this picture.</li>
+      <li>The names are frozen. Do not judge whether a name is the best word, and do not suggest another one.</li>
+      <li>When a new option appears, check it the same way.</li>
+      <li>If the right answer itself looks wrong, or the picture is unclear, tick the box, write a note, and go on.</li>
+      <li>Work alone. Do not look at any model answer while you review.</li>
+    </ul>
+    <div class="row"><button type="button" id="btnRulesClose" class="ok">Back to the review</button></div>
+  </div>
+</div>
+
+<div class="cover" id="done" hidden>
+  <div class="sheet">
+    <h2 id="doneTitle"></h2>
+    <p id="doneText"></p>
+    <p>Download the log now and upload the file to Google Drive, folder <b>human/HT-6/</b>. Then tell the person who runs ASSET-11.</p>
+    <div class="row">
+      <button type="button" id="btnDoneSave" class="ok">Download the log</button>
+      <button type="button" id="btnDoneClose">Look at the sets again</button>
+    </div>
+  </div>
+</div>
+
+<div class="cover" id="broken" hidden>
+  <div class="sheet">
+    <h2>This file cannot be used</h2>
+    <p id="brokenText" class="bad"></p>
+    <p>Do not start the review. Send this message to the person who ran ASSET-11 and ask for a new file.</p>
+  </div>
+</div>
+
+<div class="cover" id="template" hidden>
+  <div class="sheet">
+    <h2>This is the empty template, not the review sheet</h2>
+    <p>This file belongs in the repo, in <b>scripts/</b>. The ASSET-11 script fills it with the sets and the pictures.</p>
+    <p>To review, open <b>ht6_review.html</b> from Google Drive, folder <b>human/HT-6/</b>. That file is large, because it holds the pictures.</p>
+  </div>
+</div>
+
+<script type="application/json" id="d">/*__DATA__*/</script>
+<!--__IMAGES__-->
+<script>
+(function () {
+  "use strict";
+  var D, N, KEY;
+  var REASON = { name: "also a right name", visible: "also a main object in the picture",
+                 other: "other reason" };
+  var S = { reviewer: "", at: 0, items: {}, dirty: false };
+  var storageOk = true;
+  var shownAt = 0, rejectedAt = 0, GUARD_MS = 350;   // a second press inside this time is ignored
+  function $(id) { return document.getElementById(id); }
+  function el(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) { e.className = cls; }
+    if (text != null) { e.textContent = text; }
+    return e;
+  }
+  function broken(why) { $("brokenText").textContent = why; $("broken").hidden = false; }
+
+  if ($("d").textContent.trim() === "/*" + "__DATA__" + "*/") { $("template").hidden = false; return; }
+  try { D = JSON.parse($("d").textContent); } catch (e) { broken("The data block cannot be read."); return; }
+  N = D.items.length;
+  KEY = "ht6:" + D.sha;
+
+  // ---- the rule of replacement: the same function as fc_options.Builder.fill ----
+  function build(gid, rej) {
+    var g = D.golds[gid], cl = g.sib.concat(g.out), queues = [cl, cl, g.out];
+    function first(q, used, skip) {
+      for (var j = 0; j < q.length; j++) {
+        if (!used[q[j]] && !(skip && skip[q[j]])) { return q[j]; }
+      }
+      throw new Error("no candidate left for " + gid);
+    }
+    var used = {}, draft = [], k, c;
+    used[gid] = 1;
+    for (k = 0; k < 3; k++) { c = first(queues[k], used, null); draft.push(c); used[c] = 1; }
+    var slots = draft.map(function (x) { return rej[x] ? null : x; });
+    used = {};
+    used[gid] = 1;
+    slots.forEach(function (x) { if (x) { used[x] = 1; } });
+    for (k = 0; k < 3; k++) {
+      if (slots[k] === null) { c = first(queues[k], used, rej); slots[k] = c; used[c] = 1; }
+    }
+    return { draft: draft, slots: slots };
+  }
+  function prune(gid, r) {            // drop rejections that change nothing
+    var moot = [], changed = true;
+    while (changed) {
+      changed = false;
+      var keys = Object.keys(r).sort();
+      for (var j = 0; j < keys.length; j++) {
+        var rest = {};
+        for (var m = 0; m < keys.length; m++) { if (m !== j) { rest[keys[m]] = 1; } }
+        if (build(gid, rest).slots.indexOf(keys[j]) < 0) {
+          delete r[keys[j]];
+          moot.push(keys[j]);
+          changed = true;
+          break;
+        }
+      }
+    }
+    return moot;
+  }
+
+  // ---- state ---------------------------------------------------------------------
+  function blank() { return { r: {}, v: 0, f: 0, n: "" }; }
+  function peek(i) { return S.items[D.items[i][0]] || blank(); }
+  function st(i) {
+    var qa = D.items[i][0];
+    if (!S.items[qa]) { S.items[qa] = blank(); }
+    return S.items[qa];
+  }
+  function loadState() {
+    try {
+      var t = window.localStorage.getItem(KEY);
+      if (t) {
+        var o = JSON.parse(t);
+        if (o && typeof o === "object" && o.items) { S = o; }
+      }
+    } catch (e) { storageOk = false; }
+    if (!(S.at >= 0 && S.at < N)) { S.at = 0; }
+  }
+  function saveState() {
+    try { window.localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { storageOk = false; }
+  }
+  function view(i) {
+    var it = D.items[i], gid = it[1], s = peek(i), b = build(gid, s.r), order = it[3];
+    var bySlot = [gid].concat(b.slots);
+    return { it: it, gid: gid, s: s, draft: b.draft, slots: b.slots, order: order,
+             shown: order.map(function (k) { return bySlot[k]; }),
+             changed: b.slots.join() !== b.draft.join() };
+  }
+  function tally() {
+    var t = { rev: 0, ch: 0, fl: 0 };
+    for (var i = 0; i < N; i++) {
+      var s = peek(i);
+      if (s.v) { t.rev++; if (view(i).changed) { t.ch++; } }
+      if (s.f) { t.fl++; }
+    }
+    return t;
+  }
+  function firstOpen() {
+    for (var i = 0; i < N; i++) { if (!peek(i).v) { return i; } }
+    return -1;
+  }
+  function bn(id) { return D.objects[id][0]; }
+  function en(id) { return D.objects[id][1]; }
+
+  // ---- drawing -------------------------------------------------------------------
+  function say(text, warn) {
+    $("state").textContent = text;
+    $("state").className = "state" + (warn ? " warn" : "");
+  }
+  function row(v, slot, id) {
+    var g = D.golds[v.gid], isRight = slot === 0;
+    var isNew = !isRight && v.draft[slot - 1] !== id;
+    var li = el("li", "opt" + (isRight ? " is-right" : "") + (isNew ? " is-new" : ""));
+    var names = el("div", "names");
+    var b = el("span", "bn", bn(id));
+    b.lang = "bn";
+    names.appendChild(b);
+    if (g.en) { names.appendChild(el("span", "en", en(id))); }
+    li.appendChild(names);
+    var place = v.order.indexOf(slot);
+    var letter = D.labels_bn[place] + (g.en ? " (" + D.labels_en[place] + ")" : "");
+    var meta = el("p", "meta");
+    if (isRight) {
+      meta.textContent = "The right answer. Shown to the model as option " + letter + ".";
+      if (v.it[5]) {                 // the gold is a merged spelling of this object
+        var wr = el("span", "written", "In the dataset this answer is written ");
+        var w2 = el("span", "bn", v.it[5]);
+        w2.lang = "bn";
+        wr.appendChild(w2);
+        wr.appendChild(document.createTextNode(", an accepted name of the same object."));
+        meta.appendChild(wr);
+      }
+    } else {
+      if (isNew) {
+        var nw = el("b", null, "New. It replaces ");
+        var old = el("span", "bn", bn(v.draft[slot - 1]));
+        old.lang = "bn";
+        nw.appendChild(old);
+        nw.appendChild(document.createTextNode(". "));
+        meta.appendChild(nw);
+      }
+      meta.appendChild(document.createTextNode(
+        (g.sib.indexOf(id) >= 0 ? "Wrong answer from the same group." : "Wrong answer from outside the group.") +
+        " Option " + letter + "."));
+      if (g.kinds.indexOf(id) >= 0) {
+        meta.appendChild(el("span", "look", "Look closely: this is a more specific kind of the right answer."));
+      }
+    }
+    li.appendChild(meta);
+    if (!isRight) {
+      var act = el("div", "act");
+      [["name", "Also a right name"], ["visible", "Also a main object here"],
+       ["other", "Other reason"]].forEach(function (pair) {
+        var bt = el("button", null, pair[1]);
+        bt.type = "button";
+        bt.setAttribute("data-id", id);
+        bt.setAttribute("data-reason", pair[0]);
+        act.appendChild(bt);
+      });
+      li.appendChild(act);
+    }
+    return li;
+  }
+  function rank(g, id) {
+    var k = g.sib.indexOf(id);
+    return k >= 0 ? k : g.sib.length + g.out.indexOf(id);
+  }
+  function render() {
+    var i = S.at, v = view(i), g = D.golds[v.gid], s = v.s, k;
+    $("setNo").textContent = "Set " + (i + 1) + " of " + N;
+    $("group").textContent = D.clusters[v.it[4]];
+    $("qa").textContent = v.it[0];
+    $("question").textContent = v.it[2];
+    $("onlyBn").hidden = !!g.en;
+    var node = D.images ? $("im-" + i) : null;
+    $("photo").hidden = !node;
+    $("nophoto").hidden = !!node;
+    if (node) { $("photo").src = "data:image/jpeg;base64," + node.textContent; }
+    var list = $("opts");
+    list.textContent = "";
+    list.appendChild(row(v, 0, v.gid));
+    for (k = 0; k < 3; k++) { list.appendChild(row(v, k + 1, v.slots[k])); }
+    var out = Object.keys(s.r).sort(function (a, b) { return rank(g, a) - rank(g, b); });
+    var box = $("removed");
+    box.textContent = "";
+    box.hidden = !out.length;
+    out.forEach(function (id) {
+      var p = el("p");
+      var nm = el("span", "bn", bn(id));
+      nm.lang = "bn";
+      p.appendChild(document.createTextNode("Taken out:"));
+      p.appendChild(nm);
+      p.appendChild(document.createTextNode((g.en ? "(" + en(id) + "), " : "") + REASON[s.r[id]] + "."));
+      var bt = el("button", null, "Put it back");
+      bt.type = "button";
+      bt.setAttribute("data-back", id);
+      p.appendChild(bt);
+      box.appendChild(p);
+    });
+    $("note").value = s.n || "";
+    $("flag").checked = !!s.f;
+    $("btnOk").textContent = s.v ? "Next set"
+      : (v.changed ? "Keep this change. Next set" : "No second right answer. Next set");
+    if (s.v) {
+      var nrep = 0;
+      for (k = 0; k < 3; k++) { if (v.slots[k] !== v.draft[k]) { nrep++; } }
+      say(v.changed ? "Reviewed. " + nrep + (nrep === 1 ? " wrong answer was" : " wrong answers were") + " replaced."
+                    : "Reviewed. Nothing was changed.");
+    } else {
+      say("Not reviewed yet.");
+    }
+    var t = tally();
+    $("meter").style.width = (100 * t.rev / N).toFixed(1) + "%";
+    $("counts").textContent = t.rev + " of " + N + " reviewed, " + t.ch + " changed, " + t.fl + " flagged";
+    if (document.activeElement && document.activeElement.tagName === "BUTTON") {
+      document.activeElement.blur();
+    }
+  }
+  function go(i) {
+    S.at = Math.max(0, Math.min(N - 1, i));
+    shownAt = Date.now();
+    saveState();
+    render();
+    $("app").querySelector(".panel").scrollTop = 0;
+  }
+  function touch(fn) {                 // any edit means the set must be confirmed again
+    var s = st(S.at);
+    fn(s);
+    s.v = 0;
+    S.dirty = true;
+    saveState();
+    render();
+  }
+  function showDone() {
+    var t = tally();
+    $("doneTitle").textContent = "All " + N + " sets are reviewed";
+    $("doneText").textContent = "You changed " + t.ch + " sets and flagged " + t.fl + ".";
+    $("done").hidden = false;
+  }
+  function confirmSet() {
+    if (Date.now() - shownAt < GUARD_MS) { return; }      // the set was only just shown
+    var s = st(S.at), gid = D.items[S.at][1];
+    s.n = $("note").value.trim();
+    s.f = $("flag").checked ? 1 : 0;
+    prune(gid, s.r);
+    var other = Object.keys(s.r).some(function (x) { return s.r[x] === "other"; });
+    if ((other || s.f) && !s.n) {
+      saveState();
+      render();
+      say(other ? "Write a short note first: what is the other reason?"
+                : "Write a short note first: what is wrong here?", true);
+      $("note").focus();
+      return;
+    }
+    s.v = 1;
+    S.dirty = true;
+    if (S.at < N - 1) { go(S.at + 1); return; }
+    saveState();
+    render();
+    var open = firstOpen();
+    if (open < 0) { showDone(); return; }
+    go(open);
+    say("This was the last set, but " + (N - tally().rev) + " sets are not reviewed yet. Here is the first one.", true);
+  }
+
+  // ---- the log: one CSV file ---------------------------------------------------------
+  function cell(x) {
+    x = String(x == null ? "" : x);
+    return /[",\r\n]/.test(x) ? '"' + x.replace(/"/g, '""') + '"' : x;
+  }
+  function makeCsv() {
+    var lines = [D.log_columns.join(",")];
+    for (var i = 0; i < N; i++) {
+      var v = view(i), s = v.s, g = D.golds[v.gid];
+      var rej = Object.keys(s.r).sort(function (a, b) { return rank(g, a) - rank(g, b); });
+      var r = {
+        seq: i + 1, qa_id: v.it[0], cluster: D.clusters[v.it[4]], gold_id: v.gid, gold_bn: bn(v.gid),
+        verdict: s.v ? (v.changed ? "swap" : "ok") : "",
+        rejected_ids: rej.join("|"), rejected_bn: rej.map(bn).join(" | "),
+        reasons: rej.map(function (x) { return s.r[x]; }).join("|"),
+        final_ids: v.shown.join("|"), final_bn: v.shown.map(bn).join(" | "),
+        flag: s.f ? 1 : 0, note: s.n || "", reviewer: S.reviewer || "",
+        draft_sha: D.sha, rules: D.rules
+      };
+      lines.push(D.log_columns.map(function (c) { return cell(r[c]); }).join(","));
+    }
+    return lines.join("\r\n") + "\r\n";
+  }
+  function download() {
+    var t = tally(), done = t.rev === N;
+    var name = done ? D.log_name : D.log_name.replace(/\.csv$/, "_partial.csv");
+    var blob = new Blob(["﻿" + makeCsv()], { type: "text/csv;charset=utf-8" });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 4000);
+    S.dirty = false;
+    saveState();
+    say(done ? "Downloaded " + name + ". Upload it to Drive: human/HT-6/."
+             : "Downloaded " + name + " as a backup: " + t.rev + " of " + N + " sets are reviewed. The review is not finished.", !done);
+  }
+  function parseCsv(text) {
+    if (text.charCodeAt(0) === 0xFEFF) { text = text.slice(1); }
+    var rows = [], cur = "", line = [], q = false;
+    for (var i = 0; i < text.length; i++) {
+      var ch = text[i];
+      if (q) {
+        if (ch === '"') { if (text[i + 1] === '"') { cur += '"'; i++; } else { q = false; } }
+        else { cur += ch; }
+      } else if (ch === '"') { q = true; }
+      else if (ch === ",") { line.push(cur); cur = ""; }
+      else if (ch === "\n" || ch === "\r") {
+        if (ch === "\r" && text[i + 1] === "\n") { i++; }
+        line.push(cur); cur = ""; rows.push(line); line = [];
+      } else { cur += ch; }
+    }
+    if (cur !== "" || line.length) { line.push(cur); rows.push(line); }
+    return rows.filter(function (r) { return r.length > 1 || r[0] !== ""; });
+  }
+  function loadLog(text) {
+    var rows = parseCsv(text), ix = {}, j;
+    if (rows.length < 2) { return "This file has no rows."; }
+    rows[0].forEach(function (h, k) { ix[h.trim()] = k; });
+    var need = ["qa_id", "verdict", "rejected_ids", "reasons", "flag", "note", "reviewer", "draft_sha"];
+    for (j = 0; j < need.length; j++) {
+      if (!(need[j] in ix)) { return "This is not an HT-6 log: the column " + need[j] + " is missing."; }
+    }
+    var known = {}, items = {}, got = 0, who = "";
+    D.items.forEach(function (it) { known[it[0]] = 1; });
+    for (j = 1; j < rows.length; j++) {
+      var r = rows[j], qa = r[ix.qa_id];
+      if (!known[qa]) { continue; }
+      if (r[ix.draft_sha] !== D.sha) { return "This log was made with another version of the sheet. It cannot be loaded here."; }
+      var ids = r[ix.rejected_ids] ? r[ix.rejected_ids].split("|") : [];
+      var rs = r[ix.reasons] ? r[ix.reasons].split("|") : [];
+      var rj = {};
+      for (var m = 0; m < ids.length; m++) {
+        if (D.objects[ids[m]]) { rj[ids[m]] = REASON[rs[m]] ? rs[m] : "other"; }
+      }
+      items[qa] = { r: rj, v: r[ix.verdict] ? 1 : 0, f: r[ix.flag] === "1" ? 1 : 0, n: r[ix.note] || "" };
+      got++;
+      if (r[ix.reviewer]) { who = r[ix.reviewer]; }
+    }
+    if (!got) { return "No set of this sheet is in the file."; }
+    S.items = items;
+    if (who) { S.reviewer = who; }
+    S.dirty = false;
+    saveState();
+    var open = firstOpen();
+    go(open < 0 ? 0 : open);
+    var t = tally();
+    say("Loaded the log: " + t.rev + " of " + N + " sets are reviewed.");
+    return "";
+  }
+
+  // ---- wiring ---------------------------------------------------------------------------
+  function coverOpen() {
+    return !$("start").hidden || !$("rules").hidden || !$("done").hidden || !$("broken").hidden;
+  }
+  function selfCheck() {
+    if (!N) { return "It holds no option set."; }
+    for (var gid in D.golds) {
+      if (Object.prototype.hasOwnProperty.call(D.golds, gid)) {
+        if (build(gid, {}).slots.join() !== D.golds[gid].draft.join()) {
+          return "The draft set of " + gid + " does not follow the rules.";
+        }
+      }
+    }
+    if (D.images) {
+      for (var i = 0; i < N; i++) { if (!$("im-" + i)) { return "Picture " + (i + 1) + " of " + N + " is missing. The file was not downloaded completely."; } }
+    }
+    return "";
+  }
+
+  window.HT6 = { D: D, build: build, prune: prune, makeCsv: makeCsv, loadLog: loadLog,
+                 view: view, tally: tally, state: function () { return S; },
+                 guard: function (ms) { GUARD_MS = ms; } };     // for the tests of ASSET-11
+
+  var why = "";
+  try { why = selfCheck(); } catch (e) { why = String(e && e.message || e); }
+  if (why) { broken(why); return; }
+
+  loadState();
+  $("opts").addEventListener("click", function (e) {
+    var b = e.target.closest ? e.target.closest("button[data-id]") : null;
+    if (!b || Date.now() - rejectedAt < GUARD_MS) { return; }   // not a double click
+    rejectedAt = Date.now();
+    touch(function (s) { s.r[b.getAttribute("data-id")] = b.getAttribute("data-reason"); });
+  });
+  $("removed").addEventListener("click", function (e) {
+    var b = e.target.closest ? e.target.closest("button[data-back]") : null;
+    if (!b) { return; }
+    touch(function (s) { delete s.r[b.getAttribute("data-back")]; });
+  });
+  $("note").addEventListener("change", function () {
+    var val = $("note").value.trim();
+    if (val !== (peek(S.at).n || "")) { touch(function (s) { s.n = val; }); }
+  });
+  $("flag").addEventListener("change", function () {
+    var on = $("flag").checked ? 1 : 0, val = $("note").value.trim();
+    touch(function (s) { s.f = on; s.n = val; });
+  });
+  $("btnOk").addEventListener("click", confirmSet);
+  $("btnPrev").addEventListener("click", function () { go(S.at - 1); });
+  $("btnSkip").addEventListener("click", function () { go(S.at + 1); });
+  $("btnSave").addEventListener("click", download);
+  $("btnDoneSave").addEventListener("click", function () { download(); });
+  $("btnDoneClose").addEventListener("click", function () { $("done").hidden = true; });
+  $("btnRules").addEventListener("click", function () { $("rules").hidden = false; });
+  $("btnRulesClose").addEventListener("click", function () { $("rules").hidden = true; });
+  $("btnLoad").addEventListener("click", function () { $("fileIn").value = ""; $("fileIn").click(); });
+  $("fileIn").addEventListener("change", function () {
+    var f = $("fileIn").files && $("fileIn").files[0];
+    if (!f) { return; }
+    var t = tally();
+    if (t.rev && !window.confirm("Loading a log replaces the " + t.rev + " reviewed sets saved in this browser. Go on?")) { return; }
+    var rd = new FileReader();
+    rd.onload = function () { var err = loadLog(String(rd.result)); if (err) { say(err, true); } };
+    rd.readAsText(f, "utf-8");
+  });
+  document.addEventListener("keydown", function (e) {
+    if (coverOpen() || e.altKey || e.ctrlKey || e.metaKey || e.repeat) { return; }
+    var t = e.target, tag = (t && t.tagName) || "";
+    var inNote = t === $("note");
+    if (tag === "BUTTON") { return; }                     // the button does its own work
+    if (e.key === "Enter") { e.preventDefault(); if (inNote) { t.blur(); } confirmSet(); return; }
+    if (inNote) { if (e.key === "Escape") { t.blur(); } return; }
+    if (e.key === "ArrowRight") { e.preventDefault(); go(S.at + 1); }
+    if (e.key === "ArrowLeft") { e.preventDefault(); go(S.at - 1); }
+  });
+  window.addEventListener("beforeunload", function (e) {
+    if (S.dirty && !storageOk) { e.preventDefault(); e.returnValue = ""; }
+  });
+
+  var t0 = tally();
+  $("startTitle").textContent = "Check " + N + " option sets";
+  $("startSaved").textContent = t0.rev
+    ? "This browser holds your earlier work: " + t0.rev + " of " + N + " sets are reviewed. You go on where you stopped."
+    : (storageOk ? "Your work is saved in this browser as you go. At the end you download one log file."
+                 : "This browser cannot save your work. Finish in one sitting, or download the log before you close the page.");
+  $("btnStart").textContent = t0.rev ? "Go on with the review" : "Start the review";
+  $("who").value = S.reviewer || "";
+  $("btnStart").addEventListener("click", function () {
+    var w = $("who").value.trim();
+    if (!w) { $("startMsg").hidden = false; $("who").focus(); return; }
+    S.reviewer = w;
+    $("start").hidden = true;
+    $("app").hidden = false;              // no picture and no name is shown before this point
+    var open = firstOpen();
+    go(t0.rev && open >= 0 ? open : S.at);
+  });
+  $("who").addEventListener("keydown", function (e) { if (e.key === "Enter") { $("btnStart").click(); } });
+  $("start").hidden = false;
+  $("who").focus();
+})();
+</script>
+</body>
+</html>
