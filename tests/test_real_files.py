@@ -368,11 +368,13 @@ class A2Tests(unittest.TestCase):
 
 
 # --------------------------------------------------------------------------
-# D194 (0.2.1-stage2): the refusal list after the proofreading
+# D194 (0.2.1-stage2): the refusal list after the proofreading.
+# The version test follows the current scorer: 0.2.2-stage2 (D169) changed
+# forced-choice labels only; the refusal list tested here is unchanged.
 # --------------------------------------------------------------------------
 class D194Tests(unittest.TestCase):
     def test_version(self):
-        self.assertEqual(S.SCORER_VERSION, "0.2.1-stage2")
+        self.assertEqual(S.SCORER_VERSION, "0.2.2-stage2")
 
     def test_list_size(self):
         self.assertEqual(len(S.REFUSAL_PHRASES), 57)
