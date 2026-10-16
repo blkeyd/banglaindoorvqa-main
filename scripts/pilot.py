@@ -2,19 +2,24 @@
 """
 pilot.py
 BanglaIndoorVQA, the Pilot (Design 11, 7.4, 5.4; DESIGN_ADDENDUM D9, D10, D15 and E;
-decisions D155 to D159, DESIGN_ADDENDUM F).
+decisions D155 to D163, DESIGN_ADDENDUM F) and the Pilot reading (DESIGN_ADDENDUM B10, F5,
+H5; decisions D164 to D168, DESIGN_ADDENDUM F7 on).
 
 The pilot runs the 100 PILOT items under the EXP-L and EXP-N conditions for the three
 models, through the ASSET-8 harness (scripts/asset8_harness.py, src/harness.py). This
-script adds no inference code. It
+script adds no inference code and no scoring code. It
   - checks every input before the first run (Cell 0 of notebooks/pilot.ipynb),
   - runs harness commands, with the items of each condition taken from the fields of
     PILOT.json (D156), never from qa_id lists,
   - runs every finished command a second time and checks that the second run makes 0
     calls and changes neither the cache nor the cost ledger (the first half of Gate C),
   - counts what came out: answers, empty answers, answers of 8 words or fewer, seconds
-    per item of the open models, tokens per Gemini call, projections against Design 12.
-It never prints a model answer. Question text is printed only by 'preview'.
+    per item of the open models, tokens per Gemini call, projections against Design 12,
+  - for the Pilot reading: checks the forced-choice prompts against the option file, starts
+    scripts/asset9_scorer.py score once per cache, and reads Gates C and D from the scored
+    records (D163, D190, D166).
+It never prints a model answer. Question text is printed only by 'preview'. Files with
+answer text go to Google Drive only (scored/pilot/).
 
 Commands (run from the repo root, in Colab)
     check     one PASS or FAIL line per input; INFO lines are notes
@@ -27,6 +32,13 @@ Commands (run from the repo root, in Colab)
     exclusions  D160 and D161: list the probe items to exclude (the gold slip H68_0023_q2 and
               every question with the word for 'marked'); with --write, append them to
               probes/excluded_items.csv (never changes or removes a row)
+    fc-verify D164: every forced-choice item is in the cache once, and every forced-choice
+              prompt shows the scorer's four options in the order of the option file; with
+              --dry-run on the dry-run caches (Cell 8a), before any billed forced-choice call
+    score     D165: scripts/asset9_scorer.py score, once per cache (the three pilot caches, the
+              D5 repeat, the Batch test of 2026-10-05), into Drive scored/pilot/
+    read      the Pilot reading: Gate C (both halves), Gate D, D5 agreement, refusal rates,
+              correct answers that hold a refusal phrase, forced choice, the 10-item sample
 
 Item groups (D156)
     english3     L-EB, L-EE, L-EE0 on 3 closed items by seeded rank: the first English calls
@@ -37,7 +49,8 @@ Item groups (D156)
     d5-closed, d5-naming   the D5 repeat (stage smoke, run name pilot-repeat); only with
                  --d5-approved, after its decision row is accepted
 
-Everything this script writes goes to Google Drive outputs/ (model output, D150).
+Everything this script writes goes to Google Drive: outputs/ (model output, D150) and
+scored/pilot/ (scored records and the reading).
 """
 
 import argparse
@@ -71,7 +84,7 @@ except ImportError as _exc:  # pragma: no cover
     sys.exit(f"STOP: cannot import the files in src/ ({_exc}). Run this script from the repo, "
              "with normalise.py, cost_ledger.py, prompts.py, images.py and harness.py in src/.")
 
-SCRIPT_VERSION = "pilot-2026-10-14c"
+SCRIPT_VERSION = "pilot-2026-10-16a"
 DEFAULT_ROOT = "/content/drive/MyDrive/BanglaIndoorVQA"
 STAGE = "pilot"
 MODELS = ("gemini", "qwen", "gemma")
@@ -98,6 +111,19 @@ EXPECTED = {
     "ledger_before_usd": 0.1496,
     "transformers": "5.18.0",
     "torch_before": "2.11.0+cu130",
+    # The Pilot reading (PROJECT_STATE and DESIGN_ADDENDUM B9, H2 of 2026-10-16)
+    "excluded_now_sha256": "8c51763fad6e3c48f0ae1e137573d00e1d0e79274bf959d9bb8e0bca96b37cdb",
+    "excluded_now_rows": 28,
+    "fc_options_sha256": "5288ba63033083b10beab8eb5949f3f6a2ab3968a4baf8eb8bb2e1b0fdcf2e96",
+    "fc_sets": {"bn": 492, "en": 454},
+    "pfce_sha256": "807e987b4b656586ee2955efb421e8e6cd0aae27790a11a4c4f3f4f7210479ae",
+    "pfce_n": 454,
+    "pclust_n": 492,
+    "pclust_sha_prefix": "7759dcce19e4",
+    "scorer_version": "0.2.1-stage2",
+    "scoring_sha256": "72781bfd879cd821d78ee8733ec891a9bc7061a4d8f123a34fb9af462e236ed2",
+    "asset9_scorer_sha256": "c16f6c9485894d6a442777bdbd6ab6edd234474f6534f8df511f27f662752b50",
+    "refusal_phrases": 57,
 }
 
 # The Gemini model ID and prices were read on Google's pages in the Pilot chat (Design 0.2 rule 5).
@@ -152,6 +178,7 @@ GROUPS = {
                    "note": "D5 repeat: the N-BB requests of the 40 naming items again"},
 }
 SCOPE_GROUPS = ("english3", "exp-l", "exp-n-open")
+FC_GROUPS = ("exp-n-fcb", "exp-n-fce")      # the Pilot reading, Cell 8 (D164)
 
 # Excluded items (D110; DESIGN_ADDENDUM C4). Reason codes, the scored probe sets in the order
 # of the 'probes' column, and the two exclusions decided in the Pilot chat.
@@ -169,10 +196,10 @@ EXCLUSION_STEP = {
 }
 
 # Calls per condition and model in the full runs (DESIGN_ADDENDUM A1; Design 7.1, 7.2).
+PFCE_N = 454   # P-FCE run size from ASSET-11 (DESIGN_ADDENDUM H1); replaces the Design 7.2 planning value 300
 MAIN_N = {"L-BB": 1118, "L-BE": 1118, "L-EB": 1118, "L-EE": 1118, "L-BB0": 1118, "L-EE0": 1118,
           "N-BB": 1000, "N-BE": 1000, "N-BBs": 1000, "N-FCB": 492, "N-FCB0": 492,
-          "N-FCE": None, "N-FCE0": None}
-PFCE_PLANNING = 300   # Design 7.2 planning value until ASSET-11 gives the P-FCE size (upper bound 471, C1)
+          "N-FCE": PFCE_N, "N-FCE0": PFCE_N}
 # EXP-R evaluation (G2): 16,650 generations = R-BB and R-EE with the image, R-BB0 without,
 # 4 model versions, less the base answers reused from EXP-L.
 EXP_R_EVAL = {"image": 11100, "noimage": 5550, "loads": 4}
@@ -894,15 +921,16 @@ def check_ledger(paths, a, L, ctx):
     total = ledger_total(paths.ledger)
     pilot = stage_spend(paths.ledger, "pilot")
     room = cost_ledger.HARD_CAP_USD - total
-    ok = room > 2.0 and pilot < 2.0
+    ok = room > 2.0 and pilot + 2.5 * FC_USD_ESTIMATE < 2.0
     note = ""
     if pilot == 0 and abs(total - EXPECTED["ledger_before_usd"]) > 0.00005:
         note = f"; PROJECT_STATE says {EXPECTED['ledger_before_usd']:.4f} USD so far: bring both numbers"
     L.add("PASS" if ok else "FAIL", "C13",
           f"API ledger: project total {total:.4f} USD of {cost_ledger.HARD_CAP_USD:.0f}; stage pilot "
-          f"{pilot:.4f} of 2.00 USD; the 9 Gemini conditions are expected near 0.35 USD (estimate from the "
-          f"smoke-run costs; the harness prints a ceiling){note}. Prepaid credit is not visible to the API: "
-          "compare with the AI Studio billing page after the run")
+          f"{pilot:.4f} of 2.00 USD; the four forced-choice conditions add about {FC_USD_ESTIMATE:.2f} USD "
+          f"(80 Gemini calls, estimated from the pilot's measured tokens; the harness prints a ceiling and "
+          f"enforces the stage cap){note}. Prepaid credit is not visible to the API: compare with the AI "
+          "Studio billing page after the run")
 
 
 def check_env(paths, a, L, ctx):
@@ -1012,6 +1040,219 @@ def check_outputs(paths, a, L, ctx):
           + ". A run goes on from what is there.")
 
 
+# ---- the Pilot reading: forced-choice files, scorer and outputs (C17 to C24) ----------------------
+def check_excluded_now(paths, a, L, ctx):
+    if not paths.excluded.exists():
+        L.add("SKIP", "C17", "the excluded list: see C09")
+        return
+    sha = H.file_sha256(paths.excluded)
+    rows, _cols = read_excluded(paths.excluded)
+    items = ctx.get("items") or []
+    listed = sorted({r["qa_id"] for r in rows} & {r["qa_id"] for r in items})
+    if sha == EXPECTED["excluded_now_sha256"] and len(rows) == EXPECTED["excluded_now_rows"]:
+        L.add("PASS", "C17", f"the excluded list is the {len(rows)}-row list of PROJECT_STATE (sha256 {sha[:12]}, D203 "
+                             f"included). PILOT items on it: {', '.join(listed) or 'none'}; "
+                             f"{len(items) - len(listed)} PILOT items are scored")
+    else:
+        L.add("INFO", "C17", f"the excluded list has {len(rows)} rows (sha256 {sha[:12]}), not the 28-row list of "
+                             "PROJECT_STATE (8c51763fad6e). Every count follows the list as it is (D110); bring this "
+                             "line to the Pilot reading chat before Cell 11")
+
+
+def check_fc_options(paths, a, L, ctx):
+    p = paths.root / "probes" / "fc_options.jsonl"
+    if not p.exists():
+        L.add("FAIL", "C18", f"missing {p}, the final ASSET-11 option file")
+        return
+    _S, FCm = _scorer()
+    sha = H.file_sha256(p)
+    table = FCm.read_option_sets(str(p))
+    n = Counter(k[1] for k in table)
+    ctx["fc_table"], ctx["fc_module"] = table, FCm
+    problems = []
+    if sha != EXPECTED["fc_options_sha256"]:
+        problems.append(f"sha256 {sha[:12]} is not the ASSET-11 stage 2 file ({EXPECTED['fc_options_sha256'][:12]})")
+    if dict(n) != EXPECTED["fc_sets"]:
+        problems.append(f"{dict(n)} sets by language, expected {EXPECTED['fc_sets']}")
+    if problems:
+        L.add("FAIL", "C18", "Drive probes/fc_options.jsonl: " + "; ".join(problems) + ". Do not run Cell 8.")
+        return
+    L.add("PASS", "C18", f"Drive probes/fc_options.jsonl: sha256 {sha[:12]}, the final file of ASSET-11 stage 2; "
+                         f"{sum(n.values())} option sets ({n['bn']} Bangla, {n['en']} English) read through "
+                         "src/fc_options.py")
+
+
+def check_pfce(paths, a, L, ctx):
+    p = paths.root / "probes" / "P-FCE.json"
+    if not p.exists():
+        L.add("FAIL", "C19", f"missing {p}")
+        return
+    sha = H.file_sha256(p)
+    ids = [r["qa_id"] for r in H.load_probe(p)["items"]]
+    ctx["pfce_ids"] = set(ids)
+    problems = []
+    if sha != EXPECTED["pfce_sha256"]:
+        problems.append(f"sha256 {sha[:12]} is not the ASSET-11 file ({EXPECTED['pfce_sha256'][:12]})")
+    if len(ids) != EXPECTED["pfce_n"] or len(set(ids)) != len(ids):
+        problems.append(f"{len(ids)} items ({len(set(ids))} different), expected {EXPECTED['pfce_n']}")
+    lst = paths.repo / "probes" / "P-FCE.ids.txt"
+    if not lst.exists():
+        problems.append(f"missing {lst}")
+    elif set(read_ids(lst)) != set(ids):
+        problems.append("the qa_ids differ from repo probes/P-FCE.ids.txt")
+    if problems:
+        L.add("FAIL", "C19", "Drive probes/P-FCE.json: " + "; ".join(problems) + ". Do not run Cell 8.")
+        return
+    L.add("PASS", "C19", f"Drive probes/P-FCE.json: sha256 {sha[:12]}, {len(ids)} items, the same qa_ids as repo "
+                         "probes/P-FCE.ids.txt")
+
+
+def check_fc_items(paths, a, L, ctx):
+    need = ("items", "naming", "closed", "pclust", "excluded", "fc_table", "fc_module", "pfce_ids")
+    if any(ctx.get(k) is None for k in need):
+        L.add("SKIP", "C20", "forced-choice items of the pilot: an earlier input failed")
+        return
+    pc_path = paths.root / "probes" / "P-CLUST.json"
+    if not pc_path.exists():
+        L.add("FAIL", "C20", f"missing {pc_path}")
+        return
+    pc_sha = H.file_sha256(pc_path)
+    pclust_ids = {r["qa_id"] for r in H.load_probe(pc_path)["items"]}
+    FCm, table, pfce = ctx["fc_module"], ctx["fc_table"], ctx["pfce_ids"]
+    problems = []
+    if len(pclust_ids) != EXPECTED["pclust_n"] or not pc_sha.startswith(EXPECTED["pclust_sha_prefix"]):
+        problems.append(f"P-CLUST.json has {len(pclust_ids)} items, sha256 {pc_sha[:12]} (expected "
+                        f"{EXPECTED['pclust_n']}, {EXPECTED['pclust_sha_prefix']})")
+    flag = [r["qa_id"] for r in ctx["naming"] if (r.get("in_pclust") is True) != (r["qa_id"] in pclust_ids)]
+    if flag:
+        problems.append(f"in_pclust of PILOT.json disagrees with P-CLUST.json for {flag[:5]}")
+    fcb = [r["qa_id"] for r in ctx["pclust"]]
+    fce = [r["qa_id"] for r in ctx["naming"] if r["qa_id"] in pfce]
+    for qa_ids, lang in ((fcb, "bn"), (fce, "en")):
+        for qa in qa_ids:
+            try:
+                FCm.options_for(table, qa, lang)
+            except Exception as exc:
+                problems.append(f"{qa} has no {lang} option set ({type(exc).__name__})")
+    if not set(fce) <= set(fcb):
+        problems.append(f"naming items in P-FCE but not in P-CLUST: {sorted(set(fce) - set(fcb))}")
+    if problems:
+        L.add("FAIL", "C20", "forced-choice items of the pilot: " + "; ".join(problems[:6]))
+        return
+    closed_in = sorted(r["qa_id"] for r in ctx["closed"] if r["qa_id"] in pclust_ids)
+    listed = sorted((set(fcb) | set(fce)) & ctx["excluded"])
+    runs = 2 * len(fcb) + 2 * len(fce)
+    left = 2 * len([q for q in fcb if q in ctx["excluded"]]) + 2 * len([q for q in fce if q in ctx["excluded"]])
+    L.add("PASS", "C20", f"forced choice per model (D156): N-FCB and N-FCB0 on {len(fcb)} items (naming, in_pclust true, "
+                         f"all in P-CLUST.json), N-FCE and N-FCE0 on {len(fce)} (the naming items in P-FCE); "
+                         f"{runs} answers per model, {runs - left} outside the excluded list ({', '.join(listed) or 'none'} "
+                         f"listed); every item has its option set. The {len(closed_in)} closed-part P-CLUST items "
+                         f"({', '.join(closed_in) or 'none'}) get no forced choice")
+
+
+def check_scorer(paths, a, L, ctx):
+    S, _FCm = _scorer()
+    problems = []
+    if S.SCORER_VERSION != EXPECTED["scorer_version"]:
+        problems.append(f"scorer {S.SCORER_VERSION}, expected {EXPECTED['scorer_version']}")
+    if len(S.REFUSAL_PHRASES) != EXPECTED["refusal_phrases"]:
+        problems.append(f"{len(S.REFUSAL_PHRASES)} refusal phrases, expected {EXPECTED['refusal_phrases']} (D194)")
+    shas = {}
+    for rel, key in (("src/scoring.py", "scoring_sha256"), ("scripts/asset9_scorer.py", "asset9_scorer_sha256")):
+        shas[rel] = H.file_sha256(paths.repo / rel)
+        if shas[rel] != EXPECTED[key]:
+            problems.append(f"{rel} sha256 {shas[rel][:12]} is not the delivered ASSET-9 stage 2 file "
+                            f"({EXPECTED[key][:12]}, addendum B9)")
+    if problems:
+        L.add("FAIL", "C21", "scorer: " + "; ".join(problems) + ". A scorer change needs a new version, the 431 "
+                             "tests and a decision row before any reading")
+        return
+    fc_sha = H.file_sha256(paths.repo / "src" / "fc_options.py")
+    L.add("PASS", "C21", f"scorer {S.SCORER_VERSION}: src/scoring.py {shas['src/scoring.py'][:12]} and "
+                         f"scripts/asset9_scorer.py {shas['scripts/asset9_scorer.py'][:12]} are the files of addendum "
+                         f"B9; {len(S.REFUSAL_PHRASES)} refusal phrases; src/fc_options.py sha256 {fc_sha[:12]}")
+
+
+def check_lexicon_tag(paths, a, L, ctx):
+    problems = []
+    for rel in ("lexicon/lexicon.csv", "lexicon/closed_vocab.csv"):
+        try:
+            r = subprocess.run(["git", "-C", str(paths.repo), "show", f"gate-A:{rel}"], capture_output=True, timeout=60)
+        except Exception as exc:
+            problems.append(f"git show gate-A:{rel} failed ({type(exc).__name__})")
+            continue
+        if r.returncode != 0:
+            problems.append(f"git cannot show gate-A:{rel} (run: git -C {paths.repo} fetch --tags, then Cell 0 again)")
+        elif r.stdout != (paths.repo / rel).read_bytes():
+            problems.append(f"{rel} differs from the tag gate-A")
+    if problems:
+        L.add("FAIL", "C22", "frozen files: " + "; ".join(problems))
+    else:
+        L.add("PASS", "C22", "lexicon/lexicon.csv and lexicon/closed_vocab.csv equal the tag gate-A")
+
+
+def check_reading_inputs(paths, a, L, ctx):
+    parts, missing = [], []
+    for name, label, key in SCORE_SOURCES:
+        recs = cache_records(paths.root / "outputs" / label / key / "cache.jsonl")
+        if recs is None:
+            missing.append(f"outputs/{label}/{key}/cache.jsonl")
+            continue
+        n_fc = sum(1 for r in recs if r.get("condition_id") in FC_CONDS)
+        parts.append(f"{name} {len(recs)}" + (f" (forced choice {n_fc})" if label == STAGE else ""))
+    key_path = paths.root.joinpath(*PROOFREAD_KEY)
+    parts.append("proofread key " + ("present" if key_path.exists() else "not found (the P118 check is skipped)"))
+    if missing:
+        L.add("FAIL", "C23", "outputs for the reading: missing " + ", ".join(missing) + "; " + "; ".join(parts))
+        return
+    L.add("INFO", "C23", "outputs for the reading: " + "; ".join(parts) + ". Scoring needs 560 answers per pilot "
+                         "model (Cell 8 adds 80), 100 in the D5 repeat and 100 in the Batch test")
+
+
+ENV_KEYS = {"torch": ("torch", "torch_version"), "transformers": ("transformers", "transformers_version"),
+            "gpu": ("gpu", "gpu_name", "device_name"), "cuda": ("cuda", "cuda_version")}
+
+
+def check_stage_env(paths, a, L, ctx):
+    if a.session != "open":
+        return
+    try:
+        import torch
+        import transformers
+    except ImportError as exc:
+        L.add("FAIL", "C24", f"torch or transformers cannot be imported ({exc})")
+        return
+    now = {"torch": torch.__version__, "transformers": transformers.__version__,
+           "gpu": torch.cuda.get_device_name(0) if torch.cuda.is_available() else "",
+           "cuda": str(torch.version.cuda or "")}
+    for key in OPEN_MODELS:
+        st = H.read_json(paths.pilot_out / key / "stage_state.json", {})
+        env = st.get("env") or {}
+        if not env:
+            L.add("INFO", "C24", f"{key}: outputs/pilot/{key}/stage_state.json holds no environment; the harness "
+                                 "checks it at run time (D147)")
+            continue
+        compared, differ = [], []
+        for k, v in sorted(env.items()):
+            name = next((n for n, keys in ENV_KEYS.items() if k.lower() in keys), None)
+            if name is None or isinstance(v, (dict, list)):
+                continue
+            compared.append(k)
+            if str(v) != str(now[name]):
+                differ.append(f"{k}: stage {v}, this session {now[name]}")
+        if differ:
+            L.add("FAIL", "C24", f"{key}: this session differs from the environment stage pilot was fixed to on "
+                                 "2026-10-14 (D147): " + "; ".join(differ) + ". The harness will refuse the "
+                                 "forced-choice run. Do not install another version yourself; send this output "
+                                 "to the Pilot reading chat")
+        elif compared:
+            L.add("PASS", "C24", f"{key}: this session matches the environment of stage pilot on "
+                                 + ", ".join(f"{k} {env[k]}" for k in compared) + " (D147)")
+        else:
+            L.add("INFO", "C24", f"{key}: the stage environment has the keys {', '.join(sorted(env))}; none names "
+                                 "torch, transformers, the GPU or CUDA. The harness compares them at run time")
+
+
 def cmd_check(a):
     paths = Paths(a.root, a.repo, a.english_file, a.design)
     L, ctx = Lines(), {}
@@ -1022,7 +1263,10 @@ def cmd_check(a):
     steps = (("C01", check_repo), ("C02", check_prompts), ("C03", check_design), ("C04", check_chars),
              ("C05", check_derived), ("C06", check_conditions), ("C07", check_models), ("C08", check_pilot),
              ("C09", check_excluded), ("C10", check_english), ("C11", check_images), ("C12", check_built),
-             ("C13", check_ledger), ("C14", check_env), ("C15", check_hub), ("C16", check_outputs))
+             ("C13", check_ledger), ("C14", check_env), ("C15", check_hub), ("C16", check_outputs),
+             ("C17", check_excluded_now), ("C18", check_fc_options), ("C19", check_pfce), ("C20", check_fc_items),
+             ("C21", check_scorer), ("C22", check_lexicon_tag), ("C23", check_reading_inputs),
+             ("C24", check_stage_env))
     for cid, fn in steps:
         try:
             fn(paths, a, L, ctx)
@@ -1119,18 +1363,62 @@ def check_price_date(text):
                    "to the Pilot chat first.")
 
 
+def check_fc_file(path):
+    """D164: forced choice runs, and is scored, only on the final ASSET-11 option file."""
+    p = Path(path)
+    if not p.exists():
+        raise Fail(f"the option file {p} does not exist; forced choice uses Drive probes/fc_options.jsonl (D164)")
+    sha = H.file_sha256(p)
+    if sha != EXPECTED["fc_options_sha256"]:
+        raise Fail(f"{p.name} has sha256 {sha[:12]}: it is not the final ASSET-11 option file Drive "
+                   f"probes/fc_options.jsonl (sha256 {EXPECTED['fc_options_sha256'][:12]}, D164). The draft file "
+                   "is never run (D196).")
+    return sha
+
+
+def check_pfce_file(path):
+    """D164: the P-FCE probe file of ASSET-11 stage 2."""
+    p = Path(path)
+    if p.name != "P-FCE.json" or not p.exists():
+        raise Fail(f"P-FCE must be Drive probes/P-FCE.json, the ASSET-11 probe file (D164); got {p}")
+    sha = H.file_sha256(p)
+    if sha != EXPECTED["pfce_sha256"]:
+        raise Fail(f"{p.name} has sha256 {sha[:12]}, not the ASSET-11 P-FCE file (sha256 "
+                   f"{EXPECTED['pfce_sha256'][:12]}, D164)")
+    return sha
+
+
 def write_pfce_ids(paths, src, dry):
+    """D156, D164: the qa_ids of the PILOT naming items that are in P-FCE, as the --ids-file of the
+    harness. Only these ids are written, so the item set does not depend on how the harness combines
+    --ids-file with --where."""
     if not src:
-        raise Fail("--pfce is needed: the P-FCE probe file (P-FCE.json) or its qa_id list from ASSET-11")
+        raise Fail("--pfce is needed: Drive probes/P-FCE.json (D164)")
     p = Path(src)
-    ids = [r["qa_id"] for r in H.load_probe(p)["items"]] if p.suffix == ".json" else read_ids(p)
+    sha = check_pfce_file(p)
+    pfce = {r["qa_id"] for r in H.load_probe(p)["items"]}
+    naming = split_items(H.load_probe(paths.probe)["items"])[1]
+    ids = [r["qa_id"] for r in naming if r["qa_id"] in pfce]
     out = (paths.dry_out if dry else paths.pilot_out) / "pilot_pfce_qa_ids.txt"
     out.parent.mkdir(parents=True, exist_ok=True)
     with open(out, "w", encoding="utf-8") as f:
         f.write("\n".join(ids) + "\n")
-    say(f"P-FCE: {len(ids)} qa_ids from {p.name} written to {out}; the harness keeps the PILOT naming items "
-        "among them")
+    say(f"P-FCE: {p.name} (sha256 {sha[:12]}) holds {len(pfce)} items; {len(ids)} of them are PILOT naming "
+        f"items; their qa_ids are written to {out}")
     return out
+
+
+def require_fc_verify(paths):
+    """D164: no forced-choice run before the dry run and fc-verify of this script version passed."""
+    v = H.read_json(paths.dry_out / "fc_verify.json", {})
+    ok = (v.get("result") == "PASS" and v.get("dry_run") is True and v.get("script_version") == SCRIPT_VERSION
+          and v.get("options_sha256") == EXPECTED["fc_options_sha256"]
+          and v.get("pfce_sha256") == EXPECTED["pfce_sha256"])
+    if not ok:
+        found = (f"result {v.get('result')}, script {v.get('script_version')}, {v.get('utc')}" if v
+                 else f"no {paths.dry_out / 'fc_verify.json'}")
+        raise Fail("Forced choice runs only after the dry run of the four conditions and 'fc-verify --dry-run' "
+                   f"passed with this script version ({SCRIPT_VERSION}): run Cell 8a first (D164). Found: {found}")
 
 
 def harness_argv(paths, a, g, cfg):
@@ -1150,7 +1438,8 @@ def harness_argv(paths, a, g, cfg):
     needs = g.get("needs", ())
     if "options" in needs:
         if not a.options_file:
-            raise Fail("--options-file is needed: the ASSET-11 option sets in the D149 format")
+            raise Fail("--options-file is needed: Drive probes/fc_options.jsonl (D164)")
+        check_fc_file(a.options_file)
         argv += ["--options-file", a.options_file]
     if "pfce" in needs:
         argv += ["--ids-file", str(write_pfce_ids(paths, a.pfce, bool(a.dry_run)))]
@@ -1174,6 +1463,8 @@ def cmd_run(a):
         raise Fail(f"group {a.group} is for Gemini only")
     if "d5" in g.get("needs", ()) and not a.d5_approved:
         raise Fail("The D5 repeat runs only after the team lead's yes and its decision row: add --d5-approved then.")
+    if a.group in FC_GROUPS and not a.dry_run:
+        require_fc_verify(paths)
     P, cfg, models = load_configs(paths)
     argv, stage, run_name, cond_ids = harness_argv(paths, a, g, cfg)
     out_dir, label = H.layout(paths.root, stage, run_name, a.model, bool(a.dry_run))
@@ -1286,7 +1577,7 @@ def gpu_projection(t, model_key):
     wi, wn, su = img["wall_mean"], no["wall_mean"], t["startup_median"]
     proj = {
         "EXP-L": (4 * 1118 * wi + 2 * 1118 * wn + 1 * su) / 3600,
-        "EXP-N": ((3 * 1000 + 492 + PFCE_PLANNING) * wi + (492 + PFCE_PLANNING) * wn + 3 * su) / 3600,
+        "EXP-N": ((3 * 1000 + 492 + PFCE_N) * wi + (492 + PFCE_N) * wn + 3 * su) / 3600,
     }
     if model_key == "qwen":
         proj["EXP-R evaluation"] = (EXP_R_EVAL["image"] * wi + EXP_R_EVAL["noimage"] * wn
@@ -1427,7 +1718,7 @@ def cmd_report(a):
                     flag = "  OVER the design value: ask before the full runs" if hours > plan else ""
                     parts.append(f"{name} {hours:.2f} L4 h (design {plan}){flag}")
                 out("  projection at these speeds: " + "; ".join(parts))
-                out(f"    (EXP-N uses P-FCE = {PFCE_PLANNING}, the Design 7.2 planning value, and the with-image "
+                out(f"    (EXP-N uses P-FCE = {PFCE_N}, the ASSET-11 size (H1), and the with-image "
                     "speed for forced choice; EXP-R: 16,650 generations as in G2, adapters may be slower)")
             mj.update(timing=t, projection=proj)
         else:
@@ -1454,7 +1745,7 @@ def cmd_report(a):
             usd, usd27, pending = 0.0, 0.0, []
             for cid, n_main in MAIN_N.items():
                 x = rows_t.get(cid)
-                n_main = n_main if n_main is not None else PFCE_PLANNING
+                n_main = n_main if n_main is not None else PFCE_N
                 if not x:
                     pending.append(cid)
                     continue
@@ -1496,7 +1787,7 @@ def cmd_report(a):
             out(f"  {key:<7}{grp:<12}" + ("PASS" if ok else "FAIL" if ok is False else "not checked")
                 + f"   first run {first.get('run_id', '?')}, cache {first.get('cache_lines_after', '?')} lines, "
                 f"ledger {first.get('ledger_after', 0):.4f} USD")
-        required = SCOPE_GROUPS if not a.dry_run else ("exp-l", "exp-n-open")   # Cell 2 runs no english3
+        required = SCOPE_GROUPS + FC_GROUPS if not a.dry_run else ("exp-l", "exp-n-open")   # Cell 2 runs no english3
         todo = [x for x in required if x not in latest]
         if todo:
             all_ok = False
@@ -1718,6 +2009,789 @@ def cmd_exclusions(a):
 
 
 # --------------------------------------------------------------------------
+# The Pilot reading (DESIGN_ADDENDUM B10, F5, H5; D163, D190; D164 to D168)
+# --------------------------------------------------------------------------
+FC_CONDS = ("N-FCB", "N-FCB0", "N-FCE", "N-FCE0")
+PILOT_CONDS = tuple(SCOPE) + FC_CONDS            # the 13 pilot conditions
+NOIMAGE_CONDS = ("L-BB0", "L-EE0")
+D5_CONDS = ("L-BB", "N-BB")
+GATE_C_MIN = 0.98      # Design 11, Gate C
+GATE_D_MIN = 0.90      # Design 11, Gate D: 8 words or fewer
+FLOOR_MIN = 0.20       # Design 5.4
+FLOOR_COND = "L-EE"
+FLOOR_N = 58           # D163, H5: the scored closed items under L-EE
+# 40 image calls of about 1,160 input tokens and 40 text calls of about 90, at the standard price of
+# 0.75 USD per 1M input tokens; about 2 output tokens per call at 3.75 USD per 1M (pilot measurements, F1).
+FC_USD_ESTIMATE = 0.04
+SAMPLE_SALT = "PILOT-READING"
+SCORE_SOURCES = (      # D165: one score command per cache. Name, stage label, model key.
+    ("pilot_gemini", "pilot", "gemini"),
+    ("pilot_qwen", "pilot", "qwen"),
+    ("pilot_gemma", "pilot", "gemma"),
+    ("d5repeat_gemini", "smoke/pilot-repeat", "gemini"),
+    ("batchtest_gemini", "smoke/batchtest", "gemini"),
+)
+KEEP_FIELDS = ("prompt_sha256", "image_sha256", "settings_sha256", "mode", "ts_utc",
+               "model_version", "model_revision")
+PROOFREAD_KEY = ("human", "ASSET-9", "proofread", "proofread_key.csv")
+_OPTION_LINE = re.compile(r"^\s*(\S{1,3})\)\s*(.*?)\s*$")
+
+
+def _scorer():
+    """The repo's scorer and option-file reader, imported only when a command needs them."""
+    try:
+        import fc_options
+        import scoring
+    except ImportError as exc:
+        raise Fail(f"cannot import src/scoring.py or src/fc_options.py ({exc}); pull the repo first")
+    return scoring, fc_options
+
+
+def file_sha(path):
+    """SHA-256 of the raw bytes, as the scorer's manifest records it."""
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+
+def fc_item_sets(paths, items):
+    """D156, D164: the items of each forced-choice condition, from PILOT.json and P-FCE.json."""
+    _closed, naming, pclust = split_items(items)
+    pfce = {r["qa_id"] for r in H.load_probe(paths.root / "probes" / "P-FCE.json")["items"]}
+    fce = [r for r in naming if r["qa_id"] in pfce]
+    return {"N-FCB": pclust, "N-FCB0": pclust, "N-FCE": fce, "N-FCE0": fce}, pfce
+
+
+def expected_cells(paths, items):
+    """{condition: [qa_id, ...]} for the 13 pilot conditions."""
+    closed, naming, _pclust = split_items(items)
+    cells = {cid: [r["qa_id"] for r in (closed if spec[4] == "closed" else naming)] for cid, spec in SCOPE.items()}
+    fc, _pfce = fc_item_sets(paths, items)
+    cells.update({cid: [r["qa_id"] for r in sel] for cid, sel in fc.items()})
+    return cells
+
+
+def cache_records(path):
+    """The records of one harness cache, the first record per key (D143), read by the harness."""
+    path = Path(path)
+    return list(H.Cache(path).records.values()) if path.exists() else None
+
+
+def cells_of(recs):
+    out = {}
+    for r in recs:
+        out.setdefault((r["condition_id"], r["qa_id"]), r)
+    return out
+
+
+def pct(k, n):
+    return f"{100.0 * k / n:.1f}%" if n else "-"
+
+
+def ci_text(k, n):
+    lo, hi = wilson(k, n)
+    return f"Wilson 95% CI {100 * lo:.1f}% to {100 * hi:.1f}%"
+
+
+def write_rows(path, rows, columns):
+    """A CSV for Drive (UTF-8 with BOM, so that Excel shows Bangla). Lists become JSON text."""
+    with open(path, "w", encoding="utf-8-sig", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=list(columns), extrasaction="ignore")
+        w.writeheader()
+        for r in rows:
+            w.writerow({c: (json.dumps(r.get(c), ensure_ascii=False) if isinstance(r.get(c), (list, dict))
+                            else ("" if r.get(c) is None else r.get(c))) for c in columns})
+
+
+def verify_fc_prompts(paths, base, cells_fc):
+    """D164. For the forced-choice records of the three models under `base`: the prompt that the harness's own
+    build_work makes from the option file must have the hash stored in the record, and it must show the
+    four options the scorer reads (src/fc_options.py), in the order of the file, under the labels of the
+    question language. Returns (ok, counts, problems); ok is None when a harness helper could not be called."""
+    S, FCm = _scorer()
+    P, cfg, models = load_configs(paths)
+    opt_path = paths.root / "probes" / "fc_options.jsonl"
+    table = FCm.read_option_sets(str(opt_path))
+    english = H.load_english(paths.english, EXPECTED["english_column"])
+    man = imglib.read_manifest(paths.images)
+    try:
+        hopts = H.load_options(str(opt_path))
+    except Exception as exc:
+        return None, Counter(), [f"harness.load_options({opt_path.name}) raised {type(exc).__name__}: {exc}"]
+    # The hash comparison rests on one assumption: a cache record carries the prompt_sha256 that build_work
+    # gives for that model. It is tested first, per model, on the 60 real L-BB answers of 2026-10-14.
+    closed = split_items(H.load_probe(paths.probe)["items"])[0]
+    for key in MODELS:
+        lbb = cells_of(cache_records(paths.pilot_out / key / "cache.jsonl") or [])
+        try:
+            work = H.build_work(models[key]["model_id"], cfg["conditions"]["L-BB"], closed, P, english, None, man)
+        except Exception as exc:
+            return None, Counter(), [f"harness.build_work ({key}, L-BB) raised {type(exc).__name__}: {exc}"]
+        same = sum(1 for w, it in zip(work, closed)
+                   if (lbb.get(("L-BB", it["qa_id"])) or {}).get("prompt_sha256") == w.get("prompt_sha256"))
+        if same != len(closed):
+            return None, Counter(), [f"{key}: only {same} of {len(closed)} real L-BB records carry the prompt hash "
+                                     "that harness.build_work gives, so the forced-choice hash check cannot be read"]
+    labels = {"bn": [normalise(x) for x in getattr(FCm, "BN_LABELS", S.BN_LABELS)],
+              "en": [normalise(x) for x in getattr(FCm, "EN_LABELS", S.EN_LABELS)]}
+    counts, problems = Counter(), []
+    for key in MODELS:
+        have = cells_of(cache_records(base / key / "cache.jsonl") or [])
+        for cid in FC_CONDS:
+            cond = cfg["conditions"][cid]
+            lang = cond["question_lang"]
+            sel = cells_fc[cid]
+            try:
+                work = H.build_work(models[key]["model_id"], cond, sel, P, english, hopts, man)
+            except Exception as exc:
+                return None, counts, [f"harness.build_work ({key}, {cid}) raised {type(exc).__name__}: {exc}"]
+            for w, it in zip(work, sel):
+                qa = it["qa_id"]
+                counts["prompts"] += 1
+                rec = have.get((cid, qa))
+                if rec is None:
+                    problems.append(f"{key} {cid} {qa}: no record in the cache")
+                    continue
+                if not rec.get("prompt_sha256") or rec.get("prompt_sha256") != w.get("prompt_sha256"):
+                    problems.append(f"{key} {cid} {qa}: the record's prompt hash is not the hash of the rebuilt prompt")
+                    continue
+                counts["hash_ok"] += 1
+                if bool(w.get("has_image")) != bool(cond.get("image")) or bool(rec.get("has_image")) != bool(cond.get("image")):
+                    problems.append(f"{key} {cid} {qa}: image use differs from the condition")
+                    continue
+                try:
+                    opts, _ci = FCm.options_for(table, qa, lang)
+                except Exception as exc:
+                    problems.append(f"{key} {cid} {qa}: no {lang} option set ({type(exc).__name__})")
+                    continue
+                shown = [m.groups() for m in (_OPTION_LINE.match(x) for x in str(w.get("prompt_text", "")).split("\n")) if m]
+                if len(shown) != 4:
+                    problems.append(f"{key} {cid} {qa}: {len(shown)} option lines in the prompt, expected 4")
+                elif any(normalise(lab) != labels[lang][i] for i, (lab, _t) in enumerate(shown)):
+                    problems.append(f"{key} {cid} {qa}: the option labels are not those of the {lang} list")
+                elif any(normalise(t) != normalise(opts[i]) for i, (_lab, t) in enumerate(shown)):
+                    problems.append(f"{key} {cid} {qa}: the options shown differ from the option file (text or order)")
+                else:
+                    counts["order_ok"] += 1
+    return not problems, counts, problems
+
+
+def fc_coverage(base, cells_fc):
+    """Every forced-choice item in each model's cache once, and nothing else (D156, D164)."""
+    lines, ok = [], True
+    for key in MODELS:
+        recs = cache_records(base / key / "cache.jsonl")
+        if recs is None:
+            lines.append(f"  {key:<7}FAIL  no cache at {base / key}")
+            ok = False
+            continue
+        have = cells_of(recs)
+        parts, bad = [], []
+        for cid in FC_CONDS:
+            want = {r["qa_id"] for r in cells_fc[cid]}
+            got = {q for (c, q) in have if c == cid}
+            parts.append(f"{cid} {len(got & want)} of {len(want)}")
+            if got != want:
+                bad.append(f"{cid}: missing {sorted(want - got)[:3]}, not expected {sorted(got - want)[:3]}")
+        ok = ok and not bad
+        lines.append(f"  {key:<7}{'PASS' if not bad else 'FAIL'}  " + ", ".join(parts) + ("; " + "; ".join(bad) if bad else ""))
+    return ok, lines
+
+
+def cmd_fc_verify(a):
+    paths = Paths(a.root, a.repo, a.english_file)
+    base = paths.dry_out if a.dry_run else paths.pilot_out
+    opt_sha = check_fc_file(paths.root / "probes" / "fc_options.jsonl")
+    pfce_sha = check_pfce_file(paths.root / "probes" / "P-FCE.json")
+    items = H.load_probe(paths.probe)["items"]
+    cells_fc, _pfce = fc_item_sets(paths, items)
+    say("=" * 78)
+    say(f"fc-verify ({SCRIPT_VERSION}), {utc_now()}" + ("   DRY RUN CACHES (made-up answers)" if a.dry_run else ""))
+    say(f"option file sha256 {opt_sha[:12]}; P-FCE.json sha256 {pfce_sha[:12]}; caches under {base}")
+    say("=" * 78)
+    say("[1] every forced-choice item in the cache once, and no other item (D156)")
+    cov_ok, cov_lines = fc_coverage(base, cells_fc)
+    for line in cov_lines:
+        say(line)
+    say("[2] each prompt, rebuilt by the harness from the option file, has the record's hash and shows the "
+        "scorer's four options in the order of the file, under the labels of the question language")
+    ok, counts, problems = verify_fc_prompts(paths, base, cells_fc)
+    if ok is None:
+        say(f"  SKIP  {problems[0]}")
+        say("  The harness helper was not called as pilot.py expects. Send this output and src/harness.py to the "
+            "Pilot reading chat.")
+    else:
+        say(f"  {'PASS' if ok else 'FAIL'}  {counts['order_ok']} of {counts['prompts']} prompts; the hash matched for "
+            f"{counts['hash_ok']}")
+        for p in problems[:15]:
+            say(f"    - {p}")
+        if len(problems) > 15:
+            say(f"    ... and {len(problems) - 15} more")
+    result = "PASS" if cov_ok and ok else "FAIL"
+    H.write_json(base / "fc_verify.json", {
+        "utc": utc_now(), "script_version": SCRIPT_VERSION, "dry_run": bool(a.dry_run), "result": result,
+        "options_sha256": opt_sha, "pfce_sha256": pfce_sha, "coverage": cov_lines, "counts": dict(counts),
+        "problems": problems})
+    say(f"wrote {base / 'fc_verify.json'}")
+    say(f"FC-VERIFY: {result}" + (": the billed and GPU forced-choice runs may start (Cells 8b, 8c)."
+                                  if result == "PASS" and a.dry_run else ""))
+    return 0 if result == "PASS" else 1
+
+
+# ---- score: one score command per cache (D165) ---------------------------------------------------
+def scored_dir(paths, a):
+    d = Path(a.out_dir) if getattr(a, "out_dir", "") else paths.root / "scored" / "pilot"
+    r = d.resolve()
+    if r == paths.repo.resolve() or paths.repo.resolve() in r.parents:
+        raise Fail(f"{d} is inside the Git repo; scored files hold answer text and stay in Drive (setup Part 7)")
+    return d
+
+
+def scorer_ready(paths):
+    """The scorer files of addendum B9 with the 57 phrases of D194; returns (scoring, fc_options)."""
+    S, FCm = _scorer()
+    problems = []
+    if S.SCORER_VERSION != EXPECTED["scorer_version"]:
+        problems.append(f"scorer {S.SCORER_VERSION}, expected {EXPECTED['scorer_version']}")
+    if len(S.REFUSAL_PHRASES) != EXPECTED["refusal_phrases"]:
+        problems.append(f"{len(S.REFUSAL_PHRASES)} refusal phrases, expected {EXPECTED['refusal_phrases']}")
+    for rel, key in (("src/scoring.py", "scoring_sha256"), ("scripts/asset9_scorer.py", "asset9_scorer_sha256")):
+        if file_sha(paths.repo / rel) != EXPECTED[key]:
+            problems.append(f"{rel} is not the delivered ASSET-9 stage 2 file (addendum B9)")
+    if problems:
+        raise Fail("; ".join(problems))
+    return S, FCm
+
+
+def same_scored_inputs(man_path, cache, paths, opt_path):
+    """True when an existing scored file was made from exactly these inputs by this scorer."""
+    m = H.read_json(man_path, {})
+    inp = m.get("inputs") or {}
+    outs = inp.get("outputs") or [{}]
+    return (m.get("scorer_version") == EXPECTED["scorer_version"] and len(outs) == 1
+            and outs[0].get("sha256") == file_sha(cache)
+            and (inp.get("excluded") or {}).get("sha256") == file_sha(paths.excluded)
+            and (inp.get("options") or {}).get("sha256") == file_sha(opt_path)
+            and (inp.get("lexicon") or {}).get("sha256") == file_sha(paths.repo / "lexicon" / "lexicon.csv")
+            and (inp.get("vocabulary") or {}).get("sha256") == file_sha(paths.repo / "lexicon" / "closed_vocab.csv"))
+
+
+def cmd_score(a):
+    paths = Paths(a.root, a.repo, a.english_file)
+    out_dir = scored_dir(paths, a)
+    S, _FCm = scorer_ready(paths)
+    opt_path = paths.root / "probes" / "fc_options.jsonl"
+    opt_sha = check_fc_file(opt_path)
+    check_pfce_file(paths.root / "probes" / "P-FCE.json")
+    if file_sha(paths.probe) != EXPECTED["pilot_sha256"]:
+        raise Fail(f"{paths.probe} is not the PILOT.json of the pilot runs (sha256 {EXPECTED['pilot_sha256'][:12]})")
+    items = H.load_probe(paths.probe)["items"]
+    pilot_ids = {r["qa_id"] for r in items}
+    closed, naming, _pclust = split_items(items)
+    cells = expected_cells(paths, items)
+    want_pilot = {(c, q) for c, qs in cells.items() for q in qs}
+    want_d5 = {("L-BB", r["qa_id"]) for r in closed} | {("N-BB", r["qa_id"]) for r in naming}
+    ex_rows, _cols = read_excluded(paths.excluded)
+    ex_sha = file_sha(paths.excluded)
+    say("=" * 78)
+    say(f"pilot.py score ({SCRIPT_VERSION}), {utc_now()}: scorer {S.SCORER_VERSION}, one score command per cache (D165)")
+    say(f"excluded list {len(ex_rows)} rows (sha256 {ex_sha[:12]}); option file sha256 {opt_sha[:12]}; out {out_dir}")
+    say("=" * 78)
+    plan = []
+    for name, label, key in SCORE_SOURCES:
+        cache = paths.root / "outputs" / label / key / "cache.jsonl"
+        recs = cache_records(cache)
+        if recs is None:
+            raise Fail(f"no cache at {cache}")
+        have = cells_of(recs)
+        if len(have) != len(recs):
+            raise Fail(f"{cache}: {len(recs)} records but {len(have)} different (condition, qa_id) pairs")
+        if label == STAGE:
+            missing, extra = sorted(want_pilot - set(have)), sorted(set(have) - want_pilot)
+            if missing:
+                n_fc = sum(1 for c, _q in missing if c in FC_CONDS)
+                raise Fail(f"{name}: {len(missing)} pilot answers are missing"
+                           + (f", {n_fc} of them forced choice: run Cells 8b and 8c first" if n_fc else "")
+                           + f" (first: {missing[:3]})")
+            if extra:
+                raise Fail(f"{name}: {len(extra)} records are outside the 13 pilot conditions and their items "
+                           f"(first: {extra[:3]}). Send this output to the Pilot reading chat.")
+        else:
+            per_qa = Counter(q for _c, q in have)
+            if set(per_qa) != pilot_ids or any(v != 1 for v in per_qa.values()):
+                raise Fail(f"{name}: expected each of the 100 PILOT items once, found {len(per_qa)} items in "
+                           f"{len(have)} records")
+            if label == "smoke/pilot-repeat" and set(have) != want_d5:
+                raise Fail(f"{name}: the repeat is not L-BB on the 60 closed items and N-BB on the 40 naming items")
+        keep = [k for k in KEEP_FIELDS if any(k in r for r in recs)]
+        by = Counter(c for c, _q in have)
+        say(f"  {name:<17}{len(recs):>5} records: " + ", ".join(f"{c} {n}" for c, n in sorted(by.items())))
+        plan.append((name, label, key, cache, len(recs), keep))
+    out_dir.mkdir(parents=True, exist_ok=True)
+    results = []
+    for name, label, key, cache, n_recs, keep in plan:
+        out = out_dir / f"{name}_scored.jsonl"
+        man_path = out_dir / f"{name}_scored_manifest.json"
+        if out.exists() and man_path.exists() and same_scored_inputs(man_path, cache, paths, opt_path) \
+                and not a.overwrite:
+            say(f"\n{name}: already scored from these inputs by scorer {EXPECTED['scorer_version']}; kept {out.name}")
+            m = H.read_json(man_path, {})
+            results.append({"name": name, "out": str(out), "records": m.get("records"), "statuses": m.get("statuses"),
+                            "sha256": file_sha(out), "kept": True})
+            continue
+        if out.exists() and not a.overwrite:
+            raise Fail(f"{out} exists and was scored from other inputs. Bring this line to the Pilot reading chat; "
+                       "re-scoring needs OVERWRITE = True in Cell 10.")
+        argv = [sys.executable, str(paths.repo / "scripts" / "asset9_scorer.py"), "score",
+                "--probe", str(paths.probe), "--outputs", str(cache), "--options-file", str(opt_path),
+                "--out", str(out), "--sample", "0"]
+        for k in keep:
+            argv += ["--keep", k]
+        say("\n" + "-" * 78)
+        say(f"{name}: scripts/asset9_scorer.py score on {cache}; kept fields {', '.join(keep)}")
+        say("-" * 78)
+        rc, _text, secs = stream(argv, paths.repo)
+        if rc != 0:
+            raise Fail(f"the score command for {name} stopped with exit code {rc}; files scored before it are kept")
+        m = H.read_json(man_path, {})
+        inp = m.get("inputs") or {}
+        problems = []
+        if m.get("scorer_version") != EXPECTED["scorer_version"]:
+            problems.append(f"scorer {m.get('scorer_version')}")
+        if m.get("records") != n_recs:
+            problems.append(f"{m.get('records')} scored records for {n_recs} cache records")
+        bad_skip = {k: v for k, v in (m.get("skipped") or {}).items() if "same cache key" not in k}
+        if bad_skip:
+            problems.append(f"skipped {bad_skip}")
+        if (inp.get("excluded") or {}).get("sha256") != ex_sha:
+            problems.append("scored with another excluded list")
+        if problems:
+            raise Fail(f"{name}: " + "; ".join(problems) + ". Send this output to the Pilot reading chat.")
+        results.append({"name": name, "out": str(out), "records": m.get("records"), "statuses": m.get("statuses"),
+                        "sha256": file_sha(out), "seconds": secs, "kept": False})
+    H.write_json(out_dir / "score_run.json", {
+        "utc": utc_now(), "script_version": SCRIPT_VERSION, "scorer_version": EXPECTED["scorer_version"],
+        "excluded": {"rows": len(ex_rows), "sha256": ex_sha}, "options_sha256": opt_sha,
+        "pilot_sha256": file_sha(paths.probe), "results": results})
+    say("\n" + "=" * 78)
+    for r in results:
+        st = r.get("statuses") or {}
+        say(f"  {r['name']:<17}{r['records']:>5} records ({', '.join(f'{k} {v}' for k, v in sorted(st.items()))})"
+            f"  sha256 {r['sha256'][:12]}" + ("  (kept)" if r.get("kept") else ""))
+    say(f"wrote {out_dir / 'score_run.json'}")
+    say("SCORING DONE: run Cell 11 (read).")
+    return 0
+
+
+# ---- read: the Pilot reading ---------------------------------------------------------------------
+def load_scored(out_dir, name):
+    path = out_dir / f"{name}_scored.jsonl"
+    man_path = out_dir / f"{name}_scored_manifest.json"
+    if not path.exists() or not man_path.exists():
+        raise Fail(f"{path.name} or its manifest is not in {out_dir}: run Cell 10 (score) first")
+    recs = [json.loads(x) for x in path.read_text(encoding="utf-8").splitlines() if x.strip()]
+    return recs, H.read_json(man_path, {}), file_sha(path)
+
+
+def gate_c_first_half(paths):
+    """{model: {group: rerun_ok or None}} from pilot_runs.jsonl, the latest real run per group (D158)."""
+    out = {}
+    for key in MODELS:
+        path = paths.pilot_out / key / "pilot_runs.jsonl"
+        logs = H.read_jsonl(path)[0] if path.exists() else []
+        latest = {}
+        for rec in logs:
+            if rec.get("stage") == STAGE and not rec.get("dry_run"):
+                latest[rec["group"]] = rec
+        out[key] = {g: (latest[g].get("rerun_ok") if g in latest else None) for g in SCOPE_GROUPS + FC_GROUPS}
+    return out
+
+
+def seeded_rank(text):
+    return hashlib.sha256(f"42|{SAMPLE_SALT}|{text}".encode("utf-8")).hexdigest()
+
+
+def pick_sample(kept):
+    """D166: 10 scored pilot records for the check by Claude: the lowest seeded rank in each forced-choice
+    condition (4), in each no-image condition (2), and in 4 different with-image open conditions."""
+    pool = sorted(((seeded_rank(f"{key}|{r['condition_id']}|{r['qa_id']}"), key, r)
+                   for key in MODELS for r in kept[key] if r["scoreable"]), key=lambda x: x[0])
+    picked, used = [], set()
+    for stratum, conds in (("forced choice", FC_CONDS), ("no image", NOIMAGE_CONDS)):
+        for cid in conds:
+            x = next((x for x in pool if x[2]["condition_id"] == cid), None)
+            if x:
+                picked.append((stratum, x[1], x[2]))
+    for _rank, key, r in pool:
+        cid = r["condition_id"]
+        if cid in FC_CONDS or cid in NOIMAGE_CONDS or cid in used:
+            continue
+        used.add(cid)
+        picked.append(("with image", key, r))
+        if len(used) == 4:
+            break
+    return picked
+
+
+SAMPLE_COLS = ("n", "stratum", "model", "condition_id", "qa_id", "qa_type", "kind", "requested_lang", "gold_norm",
+               "options_shown", "answer_raw", "label", "strict", "lenient", "fidelity", "lang", "refusal",
+               "refusal_phrase", "content_found", "matched", "named_ids", "gold_value", "found_value",
+               "fc_choice", "fc_correct_index", "fc_method", "fc_valid", "fc_cross_label", "n_words")
+REFUSAL_COLS = ("source", "model", "condition_id", "qa_id", "qa_type", "kind", "gold_norm", "answer_raw", "label",
+                "strict", "lenient", "refusal", "refusal_phrase", "found_value", "proofread_code")
+PAIR_COLS = ("comparison", "condition_a", "condition_b", "qa_id", "strict_a", "strict_b", "label_a", "label_b",
+             "text_identical", "hours_apart")
+
+
+def cmd_read(a):
+    paths = Paths(a.root, a.repo, a.english_file)
+    S, FCm = scorer_ready(paths)
+    out_dir = scored_dir(paths, a)
+    opt_path = paths.root / "probes" / "fc_options.jsonl"
+    opt_sha = check_fc_file(opt_path)
+    check_pfce_file(paths.root / "probes" / "P-FCE.json")
+    table = FCm.read_option_sets(str(opt_path))
+    items = H.load_probe(paths.probe)["items"]
+    info = {r["qa_id"]: r for r in items}
+    cells = expected_cells(paths, items)
+    cells_fc, _pfce = fc_item_sets(paths, items)
+    ex_rows, _cols = read_excluded(paths.excluded)
+    excluded = {r["qa_id"] for r in ex_rows}
+    ex_sha = file_sha(paths.excluded)
+    listed_pilot = sorted(excluded & set(info))
+    EX = S.EXCLUDED_STATUS
+    text = []
+
+    def out(s=""):
+        say(s)
+        text.append(s)
+
+    # ---- the scored files and their inputs ----
+    sc = {}
+    for name, label, key in SCORE_SOURCES:
+        recs, man, sha = load_scored(out_dir, name)
+        inp = man.get("inputs") or {}
+        outs = inp.get("outputs") or [{}]
+        cache = paths.root / "outputs" / label / key / "cache.jsonl"
+        problems = []
+        if man.get("scorer_version") != EXPECTED["scorer_version"]:
+            problems.append(f"scorer {man.get('scorer_version')}")
+        if (inp.get("excluded") or {}).get("sha256") != ex_sha:
+            problems.append("scored with another excluded list")
+        if (inp.get("options") or {}).get("sha256") != opt_sha:
+            problems.append("scored with another option file")
+        if outs[0].get("sha256") != file_sha(cache):
+            problems.append("the cache changed after scoring")
+        if problems:
+            raise Fail(f"{name}: " + "; ".join(problems) + ". Run Cell 10 again with OVERWRITE = True, then Cell 11.")
+        sc[name] = {"recs": recs, "cells": cells_of(recs), "sha": sha, "label": label, "key": key}
+    want = {(c, q) for c, qs in cells.items() for q in qs}
+    selfcheck = []
+    for key in MODELS:
+        s = sc[f"pilot_{key}"]
+        if set(s["cells"]) != want or len(s["recs"]) != len(want):
+            selfcheck.append(f"pilot_{key}: the scored records are not the {len(want)} answers of the 13 conditions")
+        wrong = [k for k, r in s["cells"].items() if (r["gold_status"] == EX) != (k[1] in excluded)]
+        if wrong:
+            selfcheck.append(f"pilot_{key}: {len(wrong)} records whose excluded status does not follow the list")
+        bad = [k for k, r in s["cells"].items() if k[0] in FC_CONDS and r.get("fc_options_sha256") != opt_sha]
+        if bad:
+            selfcheck.append(f"pilot_{key}: {len(bad)} forced-choice records without the option file's sha256")
+    if selfcheck:
+        raise Fail("the scored files do not fit the pilot: " + "; ".join(selfcheck))
+    kept = {key: [r for r in sc[f"pilot_{key}"]["recs"] if r["gold_status"] != EX] for key in MODELS}
+    J = {"script_version": SCRIPT_VERSION, "utc": utc_now(), "scorer_version": S.SCORER_VERSION,
+         "inputs": {"excluded": {"rows": len(ex_rows), "sha256": ex_sha, "pilot_items_listed": listed_pilot},
+                    "options_sha256": opt_sha, "pilot_sha256": file_sha(paths.probe),
+                    "scored": {n: v["sha"] for n, v in sc.items()}}}
+    out("=" * 78)
+    out(f"PILOT READING ({SCRIPT_VERSION}), {utc_now()}; scorer {S.SCORER_VERSION} ({len(S.REFUSAL_PHRASES)} refusal phrases)")
+    out(f"scored files in {out_dir}; excluded list {len(ex_rows)} rows (sha256 {ex_sha[:12]}); PILOT items "
+        f"listed: {', '.join(listed_pilot)}")
+    out("Counts and ids only. Every number leaves out the listed items (D110, D185). Text is in the CSV files.")
+    out("=" * 78)
+    for key in MODELS:
+        out(f"  {key:<7}{len(sc[f'pilot_{key}']['recs'])} pilot answers, {len(kept[key])} outside the list")
+
+    # [1] Gate C, first half
+    out("\n[1] Gate C, first half (D158): every pilot command ran a second time with 0 calls")
+    gc1 = gate_c_first_half(paths)
+    gc1_ok = {}
+    for key in MODELS:
+        st = gc1[key]
+        gc1_ok[key] = all(v is True for v in st.values())
+        out(f"  {key:<7}{'PASS' if gc1_ok[key] else 'FAIL':<6}" + ", ".join(
+            f"{g} {'ok' if v is True else ('not run' if v is None else 'FAILED')}" for g, v in st.items()))
+    J["gate_c_first_half"] = {"per_model": gc1, "ok": gc1_ok}
+
+    # [2] Gate C, second half
+    out("\n[2] Gate C, second half (D163, D190): open answers not empty; forced-choice answers not empty and a "
+        "valid label, one option named, or a refusal; per model, outside the list")
+    gc2 = {}
+    for key in MODELS:
+        rs = kept[key]
+        op = [r for r in rs if r["task"] == "open"]
+        op_apart = [r for r in op if r["gold_status"] != "ok"]
+        op_base = [r for r in op if r["gold_status"] == "ok"]
+        op_ok = sum(1 for r in op_base if not r["is_empty"])
+        no_content = sum(1 for r in op_base if r.get("content_found") is False)
+        fc = [r for r in rs if r["task"] == "fc"]
+        fc_valid = sum(1 for r in fc if not r["is_empty"] and r["fc_valid"])
+        fc_ref = sum(1 for r in fc if not r["is_empty"] and not r["fc_valid"] and r["refusal"])
+        fc_empty = sum(1 for r in fc if r["is_empty"])
+        fc_cross = sum(1 for r in fc if not r["is_empty"] and not r["fc_valid"] and not r["refusal"]
+                       and r.get("fc_cross_label"))
+        fc_none = sum(1 for r in fc if not r["is_empty"] and not r["fc_valid"] and not r["refusal"]
+                      and not r.get("fc_cross_label"))
+        n, k = len(op_base) + len(fc), op_ok + fc_valid + fc_ref
+        ok = n > 0 and k / n >= GATE_C_MIN
+        failing = Counter(r["condition_id"] for r in op_base if r["is_empty"])
+        failing.update(r["condition_id"] for r in fc if r["is_empty"] or (not r["fc_valid"] and not r["refusal"]))
+        gc2[key] = {"ok": ok, "k": k, "n": n, "open_ok": op_ok, "open_n": len(op_base), "open_no_content": no_content,
+                    "open_unscoreable_apart": len(op_apart), "fc_n": len(fc), "fc_valid": fc_valid,
+                    "fc_refusal": fc_ref, "fc_empty": fc_empty, "fc_other_script_or_digit": fc_cross,
+                    "fc_no_single_option": fc_none, "not_counted_by_condition": dict(failing)}
+        out(f"  {key:<7}{'PASS' if ok else 'FAIL':<6}{k} of {n} = {pct(k, n)} (needs {GATE_C_MIN:.0%})")
+        out(f"         open: {op_ok} of {len(op_base)} not empty; {no_content} hold no scoreable content "
+            f"(information, D190); unscoreable gold, counted apart: {len(op_apart)}")
+        out(f"         forced choice: {fc_valid + fc_ref} of {len(fc)} parseable (label or option text {fc_valid}, "
+            f"refusal {fc_ref}); not parseable: empty {fc_empty}, other-script label or digit {fc_cross}, no single "
+            f"option {fc_none}")
+        if failing:
+            out("         not counted, by condition: " + ", ".join(f"{c} {v}" for c, v in sorted(failing.items())))
+    J["gate_c_second_half"] = gc2
+
+    # [3] Gate D
+    out("\n[3] Gate D (D163): 8 words or fewer over all of the model's pilot answers, forced choice included; "
+        "floor: strict accuracy on L-EE over the scored closed items (Design 5.4 applies it to the open models)")
+    gd = {}
+    for key in MODELS:
+        rs = kept[key]
+        short = sum(1 for r in rs if (r.get("n_words") or 0) <= 8)
+        ok8 = bool(rs) and short / len(rs) >= GATE_D_MIN
+        lee = [r for r in rs if r["condition_id"] == FLOOR_COND and r["scoreable"]]
+        kf, nf = sum(1 for r in lee if r["strict"] == 1), len(lee)
+        okf = nf > 0 and kf / nf >= FLOOR_MIN
+        applies = key in OPEN_MODELS
+        long_by = Counter(r["condition_id"] for r in rs if (r.get("n_words") or 0) > 8)
+        gd[key] = {"ok": ok8 and (okf or not applies), "short": short, "n": len(rs), "ok_8_words": ok8,
+                   "floor_k": kf, "floor_n": nf, "floor_ok": okf, "floor_applies": applies,
+                   "floor_ci95": list(wilson(kf, nf)), "over_8_by_condition": dict(long_by)}
+        out(f"  {key:<7}8-word rule {'PASS' if ok8 else 'FAIL'}: {short} of {len(rs)} = {pct(short, len(rs))} "
+            f"(needs {GATE_D_MIN:.0%})" + (f"; over 8 words: " + ", ".join(f"{c} {v}" for c, v in sorted(long_by.items()))
+                                          if long_by else ""))
+        verdict = ("PASS" if okf else "FAIL") if applies else ("above 20%" if okf else "below 20%") + ", information"
+        out(f"         floor {verdict}: L-EE strict {kf} of {nf} = {pct(kf, nf)}, {ci_text(kf, nf)}"
+            + ("" if nf == FLOOR_N else f"  (D163 expects {FLOOR_N} items)"))
+    target = next((k for k in OPEN_MODELS if gd[k]["ok"]), None)
+    J["gate_d"] = gd
+    J["exp_r_target"] = target
+
+    # [4] D5
+    out("\n[4] D5 repeat (D159, D167): the same requests to Gemini (L-BB, N-BB), paired by qa_id, prompt and "
+        "image hash, outside the list")
+    a_cache = cache_records(paths.pilot_out / "gemini" / "cache.jsonl")
+    pair_rows, d5 = [], {}
+    for bname, title in (("d5repeat_gemini", "pilot against the repeat"),
+                         ("batchtest_gemini", "pilot against the Batch test of 2026-10-05")):
+        b_cache = cache_records(paths.root / "outputs" / sc[bname]["label"] / "gemini" / "cache.jsonl")
+        index = {}
+        for r in b_cache:
+            index.setdefault((r["qa_id"], r.get("prompt_sha256"), r.get("image_sha256")), r)
+        sa, sb = sc["pilot_gemini"]["cells"], sc[bname]["cells"]
+        per, gaps = defaultdict(Counter), []
+        for r in a_cache:
+            cid = r["condition_id"]
+            if cid not in D5_CONDS:
+                continue
+            c = per[cid]
+            if r["qa_id"] in excluded:
+                c["listed"] += 1
+                continue
+            rb = index.get((r["qa_id"], r.get("prompt_sha256"), r.get("image_sha256")))
+            if rb is None:
+                c["no_partner"] += 1
+                continue
+            xa, xb = sa.get((cid, r["qa_id"])), sb.get((rb["condition_id"], rb["qa_id"]))
+            if not xa or not xb or not xa["scoreable"] or not xb["scoreable"]:
+                c["not_scored"] += 1
+                continue
+            same_text = normalise(r.get(H.ANSWER_FIELD) or "") == normalise(rb.get(H.ANSWER_FIELD) or "")
+            c["pairs"] += 1
+            c["text_same"] += same_text
+            c["strict_same"] += xa["strict"] == xb["strict"]
+            c["label_same"] += xa["label"] == xb["label"]
+            c["strict_a"] += xa["strict"] == 1
+            c["strict_b"] += xb["strict"] == 1
+            c["a1_b0"] += xa["strict"] == 1 and xb["strict"] == 0
+            c["a0_b1"] += xa["strict"] == 0 and xb["strict"] == 1
+            c["same_text_other_score"] += same_text and (xa["label"] != xb["label"] or xa["strict"] != xb["strict"])
+            ta, tb = parse_ts(r.get("ts_utc")), parse_ts(rb.get("ts_utc"))
+            hours = abs((ta - tb).total_seconds()) / 3600 if ta and tb else None
+            if hours is not None:
+                gaps.append(hours)
+            pair_rows.append({"comparison": bname, "condition_a": cid, "condition_b": rb["condition_id"],
+                              "qa_id": r["qa_id"], "strict_a": xa["strict"], "strict_b": xb["strict"],
+                              "label_a": xa["label"], "label_b": xb["label"], "text_identical": same_text,
+                              "hours_apart": None if hours is None else round(hours, 2)})
+        tot = Counter()
+        for v in per.values():
+            tot.update(v)
+        if tot["same_text_other_score"]:
+            selfcheck.append(f"{bname}: {tot['same_text_other_score']} pairs with the same text but another score")
+        med = statistics.median(gaps) if gaps else None
+        d5[bname] = {"per_condition": {c: dict(v) for c, v in per.items()}, "total": dict(tot),
+                     "median_hours_apart": med}
+        n = tot["pairs"]
+
+        def split(field):
+            return ", ".join(f"{c} {per[c][field]} of {per[c]['pairs']}" for c in D5_CONDS if c in per)
+        out(f"  {title}" + (f" (median {med:.2f} h apart)" if med is not None else "") + f": {n} pairs ("
+            + ", ".join(f"{c} {per[c]['pairs']}" for c in D5_CONDS if c in per) + f"); listed and left out "
+            f"{tot['listed']}; without a partner {tot['no_partner']}; not scoreable {tot['not_scored']}")
+        for field, what in (("text_same", "identical answer text"), ("strict_same", "same strict score"),
+                            ("label_same", "same scorer label")):
+            out(f"    {what:<22}{tot[field]} of {n} = {pct(tot[field], n)}, {ci_text(tot[field], n)} ({split(field)})")
+        out(f"    strict right: pilot {tot['strict_a']} of {n}, other run {tot['strict_b']} of {n}; changed right to "
+            f"wrong {tot['a1_b0']}, wrong to right {tot['a0_b1']}")
+    J["d5"] = d5
+
+    # [5] refusal without the image
+    out("\n[5] Without the image: refusal rate (D106; scorer 0.2.1-stage2, 57 phrases) per model, strict "
+        "accuracy beside it")
+    ref = {}
+    for key in MODELS:
+        for cid in NOIMAGE_CONDS:
+            rs = [r for r in kept[key] if r["condition_id"] == cid and r["scoreable"]]
+            n = len(rs)
+            k_ref = sum(1 for r in rs if r["refusal"])
+            k_st = sum(1 for r in rs if r["strict"] == 1)
+            k_ph = sum(1 for r in rs if r.get("refusal_phrase"))
+            k_nc = sum(1 for r in rs if r.get("content_found") is False)
+            ref[f"{key}|{cid}"] = {"n": n, "refusal": k_ref, "strict": k_st, "refusal_phrase": k_ph, "no_content": k_nc}
+            out(f"  {key:<7}{cid:<7}refusal {k_ref} of {n} = {pct(k_ref, n)}; strict {k_st} of {n} = {pct(k_st, n)}; "
+                f"a refusal phrase anywhere {k_ph}; no scoreable content {k_nc}")
+    J["refusal_no_image"] = ref
+
+    # [6] correct answers that hold a refusal phrase
+    out("\n[6] Answers scored right that hold a refusal phrase (D194: counted, never re-scored)")
+    codes = {}
+    key_path = paths.root.joinpath(*PROOFREAD_KEY)
+    if key_path.exists():
+        with open(key_path, encoding="utf-8-sig", newline="") as f:
+            for row in csv.DictReader(f):
+                for rid in (row.get("records") or "").split():
+                    codes[rid] = row.get("code")
+    rc_rows, rc_count = [], {}
+    for name, label, key in SCORE_SOURCES:
+        hits = [r for r in sc[name]["recs"] if r["gold_status"] != EX and r.get("refusal_phrase")
+                and r.get("lenient") == 1]
+        cnt = Counter(r["condition_id"] for r in hits)
+        cnt_strict = Counter(r["condition_id"] for r in hits if r.get("strict") == 1)
+        rc_count[name] = {"lenient": len(hits), "strict": sum(cnt_strict.values()),
+                          "by_condition": {c: [cnt[c], cnt_strict[c]] for c in cnt}}
+        for r in hits:
+            rid = f"{r.get('model_key') or key}:{r['condition_id']}:{r['qa_id']}"
+            rc_rows.append(dict(r, source=name, model=key, proofread_code=codes.get(rid, "")))
+        out(f"  {name:<17}{len(hits)} right on content (lenient 1), {sum(cnt_strict.values())} of them strict 1"
+            + (": " + ", ".join(f"{c} {cnt[c]} (strict {cnt_strict[c]})" for c in sorted(cnt)) if cnt else ""))
+    p118 = sorted(rid for rid, code in codes.items() if code == "P118")
+    if not key_path.exists():
+        out("  P118: the proofread key is not in Drive human/ASSET-9/proofread/; not checked")
+        p118_ok = None
+    else:
+        found = {f"{r.get('model_key') or r['model']}:{r['condition_id']}:{r['qa_id']}" for r in rc_rows
+                 if r["source"].startswith("pilot_")}
+        hit = [rid for rid in p118 if rid in found]
+        p118_ok = bool(hit)
+        out(f"  P118 (record{'s' if len(p118) != 1 else ''} {', '.join(p118) or 'none in the key'}): "
+            + (f"{len(hit)} of {len(p118)} counted above, as D194 expects" if p118_ok
+               else "NOT among the answers counted above"))
+        if not p118_ok:
+            selfcheck.append("P118 is not among the correct answers that hold a refusal phrase")
+    J["refusal_phrase_correct"] = {"counts": rc_count, "p118": p118, "p118_found": p118_ok}
+
+    # [7] forced choice
+    out("\n[7] Forced choice (information; chance is 25%)")
+    fcj = {}
+    for key in MODELS:
+        for cid in FC_CONDS:
+            rs = [r for r in kept[key] if r["condition_id"] == cid]
+            n = len(rs)
+            right = sum(1 for r in rs if r["strict"] == 1)
+            by_label = sum(1 for r in rs if r.get("fc_method") == "label")
+            by_text = sum(1 for r in rs if r.get("fc_method") == "text")
+            inv = sum(1 for r in rs if r["label"] == S.INVALID)
+            fcj[f"{key}|{cid}"] = {"n": n, "right": right, "by_label": by_label, "by_text": by_text, "invalid": inv}
+            out(f"  {key:<7}{cid:<7}right {right} of {n} = {pct(right, n)}; read from a label {by_label}, from the "
+                f"option text {by_text}; invalid {inv}")
+    J["forced_choice"] = fcj
+
+    # [8] the prompts the models saw
+    out("\n[8] Forced-choice prompts against the option file (D164), the real caches of the three models")
+    cov_ok, cov_lines = fc_coverage(paths.pilot_out, cells_fc)
+    for line in cov_lines:
+        out(line)
+    ok_p, counts, problems = verify_fc_prompts(paths, paths.pilot_out, cells_fc)
+    if ok_p is None:
+        out(f"  SKIP  {problems[0]}")
+    else:
+        out(f"  {'PASS' if ok_p else 'FAIL'}  {counts['order_ok']} of {counts['prompts']} prompts show the scorer's "
+            f"options in the order of the file; the hash matched for {counts['hash_ok']}")
+        for p in problems[:10]:
+            out(f"    - {p}")
+    if not cov_ok or ok_p is False:
+        selfcheck.append("forced-choice prompts or items")
+    J["fc_prompts"] = {"coverage_ok": cov_ok, "ok": ok_p, "counts": dict(counts), "problems": problems[:50]}
+
+    # [9] the 10-item check
+    out("\n[9] The 10-item check (D166): ids here, text in pilot_reading_sample.csv")
+    sample_rows = []
+    for i, (stratum, key, r) in enumerate(pick_sample(kept), 1):
+        row = dict(r, n=i, stratum=stratum, model=key)
+        if r["condition_id"] in FC_CONDS:
+            lang = S.condition_spec(r["condition_id"]).question_lang
+            opts, _ci = FCm.options_for(table, r["qa_id"], lang)
+            labs = getattr(FCm, "BN_LABELS" if lang == "bn" else "EN_LABELS",
+                           S.BN_LABELS if lang == "bn" else S.EN_LABELS)
+            row["options_shown"] = " | ".join(f"{labs[j]}) {o}" for j, o in enumerate(opts))
+        sample_rows.append(row)
+        out(f"  {i:>2}. {stratum:<14}{key:<7}{r['condition_id']:<7}{r['qa_id']}")
+
+    # verdict
+    out("\n" + "=" * 78)
+    out("VERDICT (per model, outside the excluded list)")
+    verdict = {}
+    for key in MODELS:
+        c_ok = gc1_ok[key] and gc2[key]["ok"]
+        d_ok = gd[key]["ok"]
+        verdict[key] = {"gate_c": c_ok, "gate_d": d_ok}
+        out(f"  {key:<7}Gate C {'PASS' if c_ok else 'FAIL'} (first half {'PASS' if gc1_ok[key] else 'FAIL'}, "
+            f"second half {pct(gc2[key]['k'], gc2[key]['n'])})   Gate D {'PASS' if d_ok else 'FAIL'} "
+            f"(8 words or fewer {pct(gd[key]['short'], gd[key]['n'])}; L-EE strict "
+            f"{pct(gd[key]['floor_k'], gd[key]['floor_n'])}" + ("" if gd[key]["floor_applies"] else ", information") + ")")
+    out(f"  fine-tuning target by Design 5.4 (the lighter model above the floor, Qwen first): "
+        + ({"qwen": "Qwen3.5-4B", "gemma": "Gemma 4 E4B"}[target] if target else "NONE: bring this to the chat"))
+    if selfcheck:
+        out("  SELF-CHECK FAILED: " + "; ".join(selfcheck) + ". The reading is not valid; send this output.")
+    else:
+        out("  self-checks: all passed")
+    J["verdict"] = verdict
+    J["selfcheck"] = selfcheck
+    out("=" * 78)
+
+    # files (Drive)
+    write_rows(out_dir / "pilot_reading_sample.csv", sample_rows, SAMPLE_COLS)
+    write_rows(out_dir / "pilot_reading_refusal_correct.csv", rc_rows, REFUSAL_COLS)
+    write_rows(out_dir / "pilot_reading_d5_pairs.csv", pair_rows, PAIR_COLS)
+    J["summaries"] = {name: S.summarise(v["recs"], by=("condition_id",)) for name, v in sc.items()}
+    H.write_json(out_dir / "pilot_reading.json", J)
+    with open(out_dir / "pilot_reading.txt", "w", encoding="utf-8") as f:
+        f.write("\n".join(text) + "\n")
+    say(f"\nwrote in {out_dir}: pilot_reading.txt and .json, pilot_reading_sample.csv ({len(sample_rows)} rows), "
+        f"pilot_reading_refusal_correct.csv ({len(rc_rows)} rows), pilot_reading_d5_pairs.csv ({len(pair_rows)} rows)")
+    return 1 if selfcheck else 0
+
+
+# --------------------------------------------------------------------------
 def main(argv=None):
     ap = argparse.ArgumentParser(description="The pilot (Design 11) on top of the ASSET-8 harness.")
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -1742,8 +2816,8 @@ def main(argv=None):
     p.add_argument("--paid-tier-confirmed", action="store_true")
     p.add_argument("--prices-checked", default=GOOGLE_CHECK["checked_utc"],
                    help="the day you last read Google's model and pricing pages (YYYY-MM-DD)")
-    p.add_argument("--options-file", default="", help="forced choice: the ASSET-11 option sets")
-    p.add_argument("--pfce", default="", help="N-FCE: the P-FCE probe file or its qa_id list")
+    p.add_argument("--options-file", default="", help="forced choice: Drive probes/fc_options.jsonl (D164)")
+    p.add_argument("--pfce", default="", help="N-FCE: Drive probes/P-FCE.json (D164)")
     p.add_argument("--d5-approved", action="store_true")
     p.add_argument("--plan-only", action="store_true", help="print the harness plan and stop")
     p = sub.add_parser("report", help="counts, seconds per item, tokens per call (counts only)")
@@ -1759,9 +2833,20 @@ def main(argv=None):
     p = sub.add_parser("exclusions", help="D160, D161: list the items to exclude; --write appends them")
     common(p)
     p.add_argument("--write", action="store_true", help="append the rows to probes/excluded_items.csv")
+    p = sub.add_parser("fc-verify", help="D164: forced-choice items and prompts against the option file")
+    common(p)
+    p.add_argument("--dry-run", action="store_true", help="check the dry-run caches (Cell 8a)")
+    p = sub.add_parser("score", help="D165: asset9_scorer.py score, once per cache, into Drive scored/pilot/")
+    common(p)
+    p.add_argument("--out-dir", default="", help="default <root>/scored/pilot")
+    p.add_argument("--overwrite", action="store_true", help="score again although a scored file exists")
+    p = sub.add_parser("read", help="the Pilot reading: Gates C and D, D5, refusals, forced choice, 10-item sample")
+    common(p)
+    p.add_argument("--out-dir", default="", help="the scored files; default <root>/scored/pilot")
     a = ap.parse_args(argv)
     fn = {"check": cmd_check, "preview": cmd_preview, "run": cmd_run, "report": cmd_report,
-          "compare": cmd_compare, "exclusions": cmd_exclusions}[a.cmd]
+          "compare": cmd_compare, "exclusions": cmd_exclusions, "fc-verify": cmd_fc_verify,
+          "score": cmd_score, "read": cmd_read}[a.cmd]
     try:
         return fn(a)
     except (Fail, H.Stop, promptlib.PromptError, imglib.ImageError, cost_ledger.BudgetExceeded,
