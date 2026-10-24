@@ -1,0 +1,33 @@
+# T5. Instrument checks
+
+| check | quantity | n | value [95% CI] | note |
+|---|---|---|---|---|
+| HT-2 translation | faithful pairs | 146 of 150 | 97.33 [93.34, 98.96] | Wilson 95% CI |
+| HT-3 naming reference | six-label agreement (primary) | 199 | 70.4 [64.7, 75.7] | house bootstrap |
+| HT-3 naming reference | six-label kappa (primary) |  | 0.274 [0.180, 0.357] |  |
+| HT-3 naming reference | strict agreement (secondary) |  | 72.4 [67.3, 77.0] |  |
+| HT-3 naming reference | strict kappa (secondary) |  | 0.271 [0.162, 0.361] |  |
+| HT-3 naming reference | strict, N1 (main row, D214) |  | 68.3 [60.4, 76.5] |  |
+| HT-3 naming reference | strict, N2 (secondary row, D214) |  | 82.9 [75.4, 88.8] |  |
+| HT-4 scorer check | scorer accuracy against consensus | 200 | 93.5 [89.8, 97.0] | house bootstrap |
+| HT-4 scorer check | kappa scorer vs checker1 |  | 0.877 [0.826, 0.928] |  |
+| HT-4 scorer check | kappa scorer vs checker2 |  | 0.900 [0.857, 0.941] |  |
+| HT-4 scorer check | kappa checker1 vs checker2 |  | 0.905 [0.860, 0.948] |  |
+| HT-4 scorer check | kappa scorer vs consensus |  | 0.924 [0.881, 0.964] |  |
+| HT-5 error audit | gold-error rate (all audited) | 200 | 1.5 [0.0, 4.1] | house bootstrap |
+| HT-5 error audit | C answers: gold or visibility | 140 | 0.7 [0.0, 2.3] | the F3 mark |
+| HT-5 error audit | C: gold_wrong | 140 | 0.7 [0.0, 2.3] |  |
+| HT-5 error audit | C: missing_variant | 140 | 7.1 [3.4, 11.3] |  |
+| HT-5 error audit | C: not_visible | 140 | 0.0 [0.0, 0.0] |  |
+| HT-5 error audit | C: ambiguous | 140 | 17.9 [10.2, 24.7] |  |
+| HT-5 error audit | C: model_wrong | 140 | 74.3 [67.1, 82.9] |  |
+| HT-5 error audit | english_copy: gold_wrong | 30 | 3.3 [0.0, 11.1] |  |
+| HT-5 error audit | english_copy: missing_variant | 30 | 66.7 [48.0, 82.1] |  |
+| HT-5 error audit | english_copy: not_visible | 30 | 0.0 [0.0, 0.0] |  |
+| HT-5 error audit | english_copy: ambiguous | 30 | 0.0 [0.0, 0.0] |  |
+| HT-5 error audit | english_copy: model_wrong | 30 | 30.0 [14.3, 48.3] |  |
+| HT-5 error audit | sibling: gold_wrong | 30 | 3.3 [0.0, 11.1] |  |
+| HT-5 error audit | sibling: missing_variant | 30 | 0.0 [0.0, 0.0] |  |
+| HT-5 error audit | sibling: not_visible | 30 | 0.0 [0.0, 0.0] |  |
+| HT-5 error audit | sibling: ambiguous | 30 | 13.3 [2.9, 29.2] |  |
+| HT-5 error audit | sibling: model_wrong | 30 | 83.3 [66.7, 95.5] |  |

@@ -1,0 +1,22 @@
+# S3. Word form by en_route and by origin3 (pooled EXP-N and EXP-L naming items)
+
+| model | group | items at Tier 1 in English | transfer % [CI] |
+|---|---|---|---|
+| Gemini 3.6 Flash | en_route yes | 446 | 61.7 [56.8, 66.2] |
+| Gemini 3.6 Flash | en_route no | 300 | 78.3 [73.4, 83.1] |
+| Gemini 3.6 Flash | origin3 english | 409 | 59.4 [54.0, 64.5] |
+| Gemini 3.6 Flash | origin3 other_loan | 216 | 87.0 [81.5, 91.9] |
+| Gemini 3.6 Flash | origin3 inherited | 121 | 65.3 [57.3, 73.9] |
+| Gemini 3.6 Flash | origin3 uncertain (left out, Design 4.3) | 0 |  |
+| Qwen3.5-4B | en_route yes | 331 | 32.9 [26.8, 38.8] |
+| Qwen3.5-4B | en_route no | 258 | 34.1 [27.2, 41.3] |
+| Qwen3.5-4B | origin3 english | 311 | 30.9 [24.8, 36.7] |
+| Qwen3.5-4B | origin3 other_loan | 159 | 47.8 [38.9, 57.6] |
+| Qwen3.5-4B | origin3 inherited | 119 | 21.0 [13.9, 29.5] |
+| Qwen3.5-4B | origin3 uncertain (left out, Design 4.3) | 0 |  |
+| Gemma 4 E4B | en_route yes | 333 | 61.6 [54.8, 68.1] |
+| Gemma 4 E4B | en_route no | 234 | 78.2 [72.5, 83.7] |
+| Gemma 4 E4B | origin3 english | 288 | 59.0 [51.8, 65.6] |
+| Gemma 4 E4B | origin3 other_loan | 174 | 86.8 [81.5, 91.4] |
+| Gemma 4 E4B | origin3 inherited | 105 | 63.8 [53.1, 75.3] |
+| Gemma 4 E4B | origin3 uncertain (left out, Design 4.3) | 0 |  |

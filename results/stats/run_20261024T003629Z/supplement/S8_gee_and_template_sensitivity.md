@@ -1,0 +1,85 @@
+# S8. GEE checks: EXP-L with house and template_id groups; word form (H4 interaction)
+
+| model | fit | term | estimate (log-odds) | robust SE | 95% CI | p | note |
+|---|---|---|---|---|---|---|---|
+| Gemini 3.6 Flash | exp_l_house | const | 1.506 | 0.159 | [1.194, 1.818] | 3.1e-21 | groups 68; no warnings |
+| Gemini 3.6 Flash | exp_l_house | q_bn | 0.076 | 0.053 | [-0.027, 0.179] | 0.1475 | groups 68; no warnings |
+| Gemini 3.6 Flash | exp_l_house | a_bn | -0.164 | 0.065 | [-0.291, -0.037] | 0.0114 | groups 68; no warnings |
+| Gemini 3.6 Flash | exp_l_house | q_bn:a_bn | -0.094 | 0.075 | [-0.241, 0.053] | 0.2113 | groups 68; no warnings |
+| Gemini 3.6 Flash | exp_l_house | type[object] | -0.795 | 0.207 | [-1.201, -0.389] | 0.0001 | groups 68; no warnings |
+| Gemini 3.6 Flash | exp_l_house | type[obj_name] | -1.293 | 0.217 | [-1.719, -0.868] | 2.5e-09 | groups 68; no warnings |
+| Gemini 3.6 Flash | exp_l_house | type[obj_property] | -0.499 | 0.198 | [-0.887, -0.112] | 0.0116 | groups 68; no warnings |
+| Gemini 3.6 Flash | exp_l_house | type[scene_id] | 0.068 | 0.226 | [-0.374, 0.511] | 0.7625 | groups 68; no warnings |
+| Gemini 3.6 Flash | exp_l_house | overview | 0.173 | 0.164 | [-0.148, 0.494] | 0.2903 | groups 68; no warnings |
+| Gemini 3.6 Flash | exp_l_template | const | 1.554 | 0.160 | [1.240, 1.868] | 2.8e-22 | groups 331; no warnings |
+| Gemini 3.6 Flash | exp_l_template | q_bn | 0.077 | 0.051 | [-0.023, 0.176] | 0.1303 | groups 331; no warnings |
+| Gemini 3.6 Flash | exp_l_template | a_bn | -0.165 | 0.067 | [-0.297, -0.033] | 0.0145 | groups 331; no warnings |
+| Gemini 3.6 Flash | exp_l_template | q_bn:a_bn | -0.094 | 0.091 | [-0.272, 0.084] | 0.2996 | groups 331; no warnings |
+| Gemini 3.6 Flash | exp_l_template | type[object] | -0.819 | 0.202 | [-1.214, -0.423] | 5.0e-05 | groups 331; no warnings |
+| Gemini 3.6 Flash | exp_l_template | type[obj_name] | -1.363 | 0.184 | [-1.723, -1.003] | 1.2e-13 | groups 331; no warnings |
+| Gemini 3.6 Flash | exp_l_template | type[obj_property] | -0.566 | 0.170 | [-0.900, -0.232] | 0.0009 | groups 331; no warnings |
+| Gemini 3.6 Flash | exp_l_template | type[scene_id] | 0.120 | 0.201 | [-0.273, 0.514] | 0.5492 | groups 331; no warnings |
+| Gemini 3.6 Flash | exp_l_template | overview | 0.132 | 0.163 | [-0.187, 0.452] | 0.4170 | groups 331; no warnings |
+| Gemini 3.6 Flash | word_form | const | -0.295 | 0.296 | [-0.876, 0.286] | 0.3197 | groups 68; no warnings |
+| Gemini 3.6 Flash | word_form | a_bn | 0.178 | 0.113 | [-0.044, 0.400] | 0.1168 | groups 68; no warnings |
+| Gemini 3.6 Flash | word_form | en_route | -0.318 | 0.149 | [-0.609, -0.026] | 0.0325 | groups 68; no warnings |
+| Gemini 3.6 Flash | word_form | a_bn:en_route | -0.511 | 0.150 | [-0.806, -0.217] | 0.0007 | groups 68; no warnings |
+| Gemini 3.6 Flash | word_form | log_freq | 0.302 | 0.071 | [0.163, 0.442] | 2.2e-05 | groups 68; no warnings |
+| Gemini 3.6 Flash | word_form | item_type[L_obj_name] | 0.289 | 0.170 | [-0.045, 0.623] | 0.0903 | groups 68; no warnings |
+| Gemini 3.6 Flash | word_form | item_type[L_object] | 0.865 | 0.154 | [0.565, 1.166] | 1.7e-08 | groups 68; no warnings |
+| Gemini 3.6 Flash | word_form | in_cluster | -0.583 | 0.112 | [-0.802, -0.364] | 1.8e-07 | groups 68; no warnings |
+| Gemini 3.6 Flash | template vs house | robust SE ratio (template / house) | q_bn 0.96; a_bn 1.04; q_bn:a_bn 1.21 |  |  |  | more conservative; language terms with a CI that excludes 0: house 1 of 3, template 1 of 3 |
+| Qwen3.5-4B | exp_l_house | const | 2.204 | 0.187 | [1.838, 2.571] | 4.6e-32 | groups 68; no warnings |
+| Qwen3.5-4B | exp_l_house | q_bn | -0.220 | 0.066 | [-0.349, -0.091] | 0.0008 | groups 68; no warnings |
+| Qwen3.5-4B | exp_l_house | a_bn | -1.359 | 0.087 | [-1.529, -1.189] | 1.7e-55 | groups 68; no warnings |
+| Qwen3.5-4B | exp_l_house | q_bn:a_bn | -0.042 | 0.083 | [-0.205, 0.121] | 0.6144 | groups 68; no warnings |
+| Qwen3.5-4B | exp_l_house | type[object] | -2.006 | 0.222 | [-2.441, -1.572] | 1.4e-19 | groups 68; no warnings |
+| Qwen3.5-4B | exp_l_house | type[obj_name] | -2.258 | 0.218 | [-2.685, -1.831] | 3.3e-25 | groups 68; no warnings |
+| Qwen3.5-4B | exp_l_house | type[obj_property] | -0.594 | 0.199 | [-0.985, -0.204] | 0.0029 | groups 68; no warnings |
+| Qwen3.5-4B | exp_l_house | type[scene_id] | -1.694 | 0.185 | [-2.056, -1.332] | 4.6e-20 | groups 68; no warnings |
+| Qwen3.5-4B | exp_l_house | overview | 0.090 | 0.126 | [-0.156, 0.337] | 0.4716 | groups 68; no warnings |
+| Qwen3.5-4B | exp_l_template | const | 2.122 | 0.249 | [1.633, 2.611] | 1.8e-17 | groups 331; no warnings |
+| Qwen3.5-4B | exp_l_template | q_bn | -0.222 | 0.107 | [-0.431, -0.012] | 0.0378 | groups 331; no warnings |
+| Qwen3.5-4B | exp_l_template | a_bn | -1.376 | 0.295 | [-1.954, -0.798] | 3.0e-06 | groups 331; no warnings |
+| Qwen3.5-4B | exp_l_template | q_bn:a_bn | -0.044 | 0.099 | [-0.238, 0.150] | 0.6573 | groups 331; no warnings |
+| Qwen3.5-4B | exp_l_template | type[object] | -2.053 | 0.214 | [-2.472, -1.633] | 7.9e-22 | groups 331; no warnings |
+| Qwen3.5-4B | exp_l_template | type[obj_name] | -2.341 | 0.335 | [-2.998, -1.683] | 3.0e-12 | groups 331; no warnings |
+| Qwen3.5-4B | exp_l_template | type[obj_property] | -0.380 | 0.324 | [-1.015, 0.256] | 0.2417 | groups 331; no warnings |
+| Qwen3.5-4B | exp_l_template | type[scene_id] | -1.605 | 0.180 | [-1.957, -1.253] | 3.9e-19 | groups 331; no warnings |
+| Qwen3.5-4B | exp_l_template | overview | 0.088 | 0.147 | [-0.201, 0.377] | 0.5507 | groups 331; no warnings |
+| Qwen3.5-4B | word_form | const | -0.266 | 0.362 | [-0.975, 0.443] | 0.4625 | groups 68; no warnings |
+| Qwen3.5-4B | word_form | a_bn | -1.848 | 0.160 | [-2.161, -1.535] | 5.3e-31 | groups 68; no warnings |
+| Qwen3.5-4B | word_form | en_route | -0.664 | 0.120 | [-0.900, -0.429] | 3.3e-08 | groups 68; no warnings |
+| Qwen3.5-4B | word_form | a_bn:en_route | 0.384 | 0.202 | [-0.011, 0.779] | 0.0570 | groups 68; no warnings |
+| Qwen3.5-4B | word_form | log_freq | 0.400 | 0.092 | [0.220, 0.581] | 1.4e-05 | groups 68; no warnings |
+| Qwen3.5-4B | word_form | item_type[L_obj_name] | 0.203 | 0.200 | [-0.189, 0.594] | 0.3102 | groups 68; no warnings |
+| Qwen3.5-4B | word_form | item_type[L_object] | 0.448 | 0.153 | [0.149, 0.747] | 0.0033 | groups 68; no warnings |
+| Qwen3.5-4B | word_form | in_cluster | -1.610 | 0.107 | [-1.820, -1.399] | 8.8e-51 | groups 68; no warnings |
+| Qwen3.5-4B | template vs house | robust SE ratio (template / house) | q_bn 1.62; a_bn 3.40; q_bn:a_bn 1.19 |  |  |  | more conservative; language terms with a CI that excludes 0: house 2 of 3, template 2 of 3 |
+| Gemma 4 E4B | exp_l_house | const | 0.637 | 0.125 | [0.392, 0.881] | 3.3e-07 | groups 68; no warnings |
+| Gemma 4 E4B | exp_l_house | q_bn | -0.023 | 0.037 | [-0.096, 0.049] | 0.5273 | groups 68; no warnings |
+| Gemma 4 E4B | exp_l_house | a_bn | -0.209 | 0.055 | [-0.316, -0.102] | 0.0001 | groups 68; no warnings |
+| Gemma 4 E4B | exp_l_house | q_bn:a_bn | 0.031 | 0.046 | [-0.060, 0.122] | 0.5007 | groups 68; no warnings |
+| Gemma 4 E4B | exp_l_house | type[object] | -0.466 | 0.175 | [-0.810, -0.123] | 0.0078 | groups 68; no warnings |
+| Gemma 4 E4B | exp_l_house | type[obj_name] | -1.094 | 0.191 | [-1.468, -0.721] | 9.3e-09 | groups 68; no warnings |
+| Gemma 4 E4B | exp_l_house | type[obj_property] | -0.055 | 0.164 | [-0.377, 0.267] | 0.7390 | groups 68; no warnings |
+| Gemma 4 E4B | exp_l_house | type[scene_id] | 0.444 | 0.202 | [0.048, 0.840] | 0.0282 | groups 68; no warnings |
+| Gemma 4 E4B | exp_l_house | overview | -0.011 | 0.148 | [-0.301, 0.278] | 0.9383 | groups 68; no warnings |
+| Gemma 4 E4B | exp_l_template | const | 0.664 | 0.158 | [0.354, 0.973] | 2.7e-05 | groups 331; no warnings |
+| Gemma 4 E4B | exp_l_template | q_bn | -0.024 | 0.040 | [-0.101, 0.054] | 0.5473 | groups 331; no warnings |
+| Gemma 4 E4B | exp_l_template | a_bn | -0.212 | 0.075 | [-0.359, -0.065] | 0.0046 | groups 331; no warnings |
+| Gemma 4 E4B | exp_l_template | q_bn:a_bn | 0.032 | 0.048 | [-0.063, 0.126] | 0.5124 | groups 331; no warnings |
+| Gemma 4 E4B | exp_l_template | type[object] | -0.552 | 0.186 | [-0.916, -0.187] | 0.0030 | groups 331; no warnings |
+| Gemma 4 E4B | exp_l_template | type[obj_name] | -1.332 | 0.371 | [-2.059, -0.605] | 0.0003 | groups 331; no warnings |
+| Gemma 4 E4B | exp_l_template | type[obj_property] | 0.065 | 0.240 | [-0.406, 0.537] | 0.7854 | groups 331; no warnings |
+| Gemma 4 E4B | exp_l_template | type[scene_id] | 0.555 | 0.299 | [-0.032, 1.142] | 0.0640 | groups 331; no warnings |
+| Gemma 4 E4B | exp_l_template | overview | -0.018 | 0.180 | [-0.370, 0.333] | 0.9180 | groups 331; no warnings |
+| Gemma 4 E4B | word_form | const | -1.349 | 0.321 | [-1.979, -0.720] | 2.6e-05 | groups 68; no warnings |
+| Gemma 4 E4B | word_form | a_bn | 0.319 | 0.117 | [0.091, 0.548] | 0.0062 | groups 68; no warnings |
+| Gemma 4 E4B | word_form | en_route | -0.301 | 0.118 | [-0.533, -0.070] | 0.0108 | groups 68; no warnings |
+| Gemma 4 E4B | word_form | a_bn:en_route | -0.817 | 0.163 | [-1.137, -0.496] | 5.8e-07 | groups 68; no warnings |
+| Gemma 4 E4B | word_form | log_freq | 0.516 | 0.089 | [0.342, 0.690] | 6.5e-09 | groups 68; no warnings |
+| Gemma 4 E4B | word_form | item_type[L_obj_name] | 0.154 | 0.230 | [-0.297, 0.605] | 0.5033 | groups 68; no warnings |
+| Gemma 4 E4B | word_form | item_type[L_object] | 0.767 | 0.139 | [0.495, 1.039] | 3.3e-08 | groups 68; no warnings |
+| Gemma 4 E4B | word_form | in_cluster | -0.948 | 0.108 | [-1.160, -0.736] | 1.8e-18 | groups 68; no warnings |
+| Gemma 4 E4B | template vs house | robust SE ratio (template / house) | q_bn 1.06; a_bn 1.37; q_bn:a_bn 1.04 |  |  |  | more conservative; language terms with a CI that excludes 0: house 1 of 3, template 1 of 3 |

@@ -1,0 +1,56 @@
+PASS  src/scoring.py                                 version 0.2.2-stage2, sha256 8563fa05f606...
+PASS  lexicon/lexicon.csv                            sha256 73b6bc48f1bd..., 231 objects, 86 in 16 clusters, 864 terms, matching: spacing-insensitive ON, suffix tolerance ON, warnings 0
+PASS  lexicon/closed_vocab.csv                       sha256 de36f2905e43..., room 4, material 16, colour 14, number 29
+PASS  probes/excluded_items.csv                      28 rows, sha256 8c51763fad6e... (pinned with the scored sizes, D231)
+PASS  configs/conditions.yaml                        16 conditions and 5 probe sizes as Design 7
+PASS  probes/P-CORE-CLOSED.ids.txt                   1118 qa_ids
+PASS  probes/R-TEST.ids.txt                          1449 qa_ids
+PASS  probes/P-NAME.ids.txt                          1000 qa_ids
+PASS  probes/P-CLUST.ids.txt                         492 qa_ids
+PASS  probes/P-FCE.ids.txt                           454 qa_ids
+PASS  probes/NAME-REF.ids.txt                        200 qa_ids
+PASS  Drive probes/P-CORE-CLOSED.json                1118 items, 68 houses, sha256 ea242d5b8ade..., same ids as the repo list: True
+PASS  Drive probes/R-TEST.json                       1449 items, 15 houses, sha256 30cd10956e56..., same ids as the repo list: True
+PASS  Drive probes/P-NAME.json                       1000 items, 61 houses, sha256 fc4bfb1dbda1..., same ids as the repo list: True
+PASS  Drive probes/P-CLUST.json                      492 items, 57 houses, sha256 7759dcce19e4..., same ids as the repo list: True
+PASS  Drive probes/P-FCE.json                        454 items, 57 houses, sha256 807e987b4b65..., same ids as the repo list: True
+PASS  NAME-REF in P-NAME                             200 of 200 NAME-REF ids are P-NAME items
+PASS  golds resolve through the scorer               3041 of 3069 items outside the list; unresolved 0
+PASS  naming items joined to an object               gold_name_id from resolve_gold for every naming item (C4); missing 0
+PASS  scored sizes (PROJECT_STATE)                   P-CORE-CLOSED 1109, R-TEST 1435, P-NAME 991, P-CLUST 483, P-FCE 446, NAME-REF 199
+PASS  bootstrap houses (Design 3.5)                  EXP-L 68, EXP-N 61, EXP-R 15
+PASS  P-CLUST clusters (lexicon join)                138, 88, 79, 61, 43, 42, 41 (Design 3.4: 138, 88, 79, 61, 43, 42, 41)
+PASS  P-FCE clusters = probe_manifest_11.json        43, 61, 41, 79, 88, 4, 138; manifest sha256 5916b56ba317...
+PASS  Drive data/house_assignment.csv                68 houses, annotator ids A1 14, A2 22, A3 18, A4 14 (names not read)
+PASS  Drive human/HT-6/ht6_swaps.csv                 53 rows, 48 item and sibling pairs with reason name (D204)
+PASS  joins of houses and HT-6 pairs                 every item has an annotator id; every HT-6 pair is a P-CLUST item
+PASS  Drive data/banglaindoorvqa.json                images 4406, houses 68, QA 18276, boxes 3620, sha256 30017e400212...
+PASS  box format (from the data, D239)               bbox_pct read as xywh
+PASS  probe items equal the dataset                  0 of 3069 probe items differ (type, house, image, question or gold)
+INFO  dataset annotator ids                          0 of 4406 images differ from house_assignment.csv
+PASS  scored files readable                          6 files, 52188 records; unreadable 0, missing keys 0, unknown condition 0, item not in the condition's probe 0
+PASS  one record per model, condition, item          identical duplicates kept once 0, conflicting duplicates 0, house differs 0, type differs 0
+PASS  record stage                                   {'main': 52188} (mode real needs every record at stage main)
+PASS  one scorer version                             {'0.2.2-stage2': 52188}; imported scorer 0.2.2-stage2
+PASS  one prompt version                             {'exp-v1': 52188}
+PASS  every model and condition complete             51 model-condition sets; EXP-R seeds qwen_ft_s42, qwen_ft_s43, qwen_ft_s44
+PASS  excluded items as the list (D185)              records whose excluded status differs from probes/excluded_items.csv: 0
+PASS  scoreable outside the list                     records not scoreable, not ok, or without strict: 0 (B4: counted, not dropped)
+PASS  gold object as the lexicon join                gold_name_id differs 0; en_route, en_unique or origin3 differ 0
+PASS  requested language and option file             requested_lang differs 0; fc_options_sha256 not 5288ba630330: 0
+PASS  one model_id per model key                     gemini: gemini-3.6-flash; gemma: google/gemma-4-E4B-it; qwen: Qwen/Qwen3.5-4B; qwen_ft_s42: Qwen/Qwen3.5-4B+ft-s42; qwen_ft_s43: Qwen/Qwen3.5-4B+ft-s43; qwen_ft_s44: Qwen/Qwen3.5-4B+ft-s44
+PASS  running scripts/analysis.py                    the file in --repo
+PASS  running src/normalise.py                       the file in --repo
+PASS  running src/scoring.py                         the file in --repo
+PASS  running src/stats.py                           the file in --repo
+PASS  lexicon/lexicon.csv at tag gate-A              identical
+PASS  lexicon/closed_vocab.csv at tag gate-A         identical
+PASS  src/scoring.py at tag gate-F                   identical
+PASS  src/normalise.py at tag gate-F                 identical
+PASS  src/stats.py at tag gate-E                     identical: the pre-specified code
+PASS  scripts/analysis.py at tag gate-E              identical: the pre-specified code
+PASS  HT-3 final files                               mode final, reportable True, counted 199, primary role N1, lexicon as gate-A True, scorer 0.2.2-stage2; both namers on every counted item True; N1 labels equal the json True; labels that differ when scored again 0
+PASS  token counts (D238)                            3354 rows, models gemini, gemma, qwen, every scored P-CORE-CLOSED item for all three: True, bad rows 0
+PASS  lexicon sensitivity rows (D238)                25 rows (D192 8, HT-5 17); rows that break the format none
+PASS  HT-4 labels (D238)                             200 answers; unknown labels 0; excluded items 0 (D185); scorer label differs from the scored file 0
+PASS  HT-5 audit (D238)                              200 answers (C 140, english_copy 30, sibling 30); unknown values 0; excluded 0; not in the scored files 0; C answers outside the error-budget C 0

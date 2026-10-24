@@ -1,0 +1,8 @@
+﻿set,images,houses_run,items_run,items_scored,excluded,houses_scored,scored by type
+dataset (QA pairs as items),4406,68,18276,,,,bounding boxes 3620
+P-CORE-CLOSED,979,68,1118,1109,9,68,"count 247, obj_name 252, obj_property 213, object 249, scene_id 148"
+R-TEST,661,15,1449,1435,14,15,"count 363, obj_name 276, obj_property 218, object 369, scene_id 209"
+P-NAME,1000,61,1000,991,9,61,obj_name 991
+P-CLUST,492,57,492,483,9,57,obj_name 483
+P-FCE,454,57,454,446,8,57,obj_name 446
+NAME-REF,200,22,200,199,1,22,obj_name 199

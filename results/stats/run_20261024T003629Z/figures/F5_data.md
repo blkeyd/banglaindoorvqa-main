@@ -1,0 +1,19 @@
+# F5 data (table view): counts per segment; human rows N1 (main, D214), N2 and pooled, with the models on the same NAME-REF items (Design 9.4 item 7)
+
+| who | condition | items | n | tier1_req | tier1_other | tier2 | sibling | ambiguous | english_copy | other_wrong | Tier-1 rate % [CI] | generic fallback % [CI] |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| gemini | N-BB | P-NAME en_unique | 960 | 483 | 1 | 30 | 56 | 30 | 89 | 271 | 50.3 [46.6, 53.9] | 5.8 [4.1, 7.5] |
+| gemini | N-BE | P-NAME en_unique | 960 | 511 | 0 | 15 | 132 | 25 | 0 | 277 | 53.2 [48.8, 57.2] | 2.9 [1.4, 4.4] |
+| gemini | N-BBs | P-NAME en_unique | 960 | 531 | 0 | 24 | 72 | 30 | 38 | 265 | 55.3 [52.0, 58.6] | 4.3 [2.2, 6.4] |
+| qwen | N-BB | P-NAME en_unique | 960 | 157 | 0 | 26 | 30 | 11 | 38 | 698 | 16.4 [13.7, 18.9] | 14.2 [9.7, 19.4] |
+| qwen | N-BE | P-NAME en_unique | 960 | 407 | 0 | 9 | 145 | 25 | 5 | 369 | 42.4 [38.7, 45.9] | 2.2 [0.8, 3.7] |
+| qwen | N-BBs | P-NAME en_unique | 960 | 117 | 0 | 21 | 18 | 15 | 37 | 752 | 12.2 [9.8, 14.6] | 15.2 [9.6, 22.1] |
+| gemma | N-BB | P-NAME en_unique | 960 | 370 | 0 | 35 | 82 | 15 | 34 | 424 | 38.5 [35.1, 41.9] | 8.6 [5.6, 12.0] |
+| gemma | N-BE | P-NAME en_unique | 960 | 389 | 0 | 13 | 136 | 28 | 0 | 394 | 40.5 [37.0, 43.9] | 3.2 [1.4, 5.7] |
+| gemma | N-BBs | P-NAME en_unique | 960 | 394 | 0 | 41 | 106 | 10 | 36 | 373 | 41.0 [37.3, 44.7] | 9.4 [7.1, 12.0] |
+| human N1 | N-BB | NAME-REF en_unique (185 items, 22 houses) | 185 | 129 | 0 | 2 | 7 | 1 | 6 | 40 | 69.7 [61.7, 77.9] | 1.5 [0.0, 3.5] |
+| human N2 | N-BB | NAME-REF en_unique (185 items, 22 houses) | 185 | 159 | 0 | 3 | 5 | 0 | 0 | 18 | 85.9 [79.9, 91.0] | 1.9 [0.0, 4.1] |
+| human pooled | N-BB | NAME-REF en_unique (185 items, 22 houses) | 370 | 288 | 0 | 5 | 12 | 1 | 6 | 58 | 77.8 [72.8, 83.1] | 1.7 [0.3, 3.3] |
+| gemini | N-BB | NAME-REF en_unique (185 items, 22 houses) | 185 | 104 | 1 | 5 | 14 | 5 | 16 | 40 | 56.2 [46.5, 64.4] | 4.6 [1.0, 9.6] |
+| qwen | N-BB | NAME-REF en_unique (185 items, 22 houses) | 185 | 29 | 0 | 8 | 5 | 5 | 14 | 124 | 15.7 [10.9, 19.6] | 21.6 [10.8, 33.3] |
+| gemma | N-BB | NAME-REF en_unique (185 items, 22 houses) | 185 | 76 | 0 | 5 | 15 | 3 | 10 | 76 | 41.1 [33.6, 47.9] | 6.2 [1.8, 12.3] |

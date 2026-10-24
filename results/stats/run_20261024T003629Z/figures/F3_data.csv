@@ -1,0 +1,47 @@
+﻿model,category,count,denominator,share % [CI]
+gemini,A1,1,258,"0.4 [0.0, 1.3]"
+gemini,A2,11,258,"4.3 [1.5, 7.3]"
+gemini,A3,6,258,"2.3 [0.4, 4.8]"
+gemini,A4,57,258,"22.1 [15.6, 28.5]"
+gemini,B,155,258,"60.1 [54.0, 66.5]"
+gemini,C,28,258,"10.9 [6.2, 16.7]"
+gemini,guessing level N-FCB0 (not A),,183,"7.7 [4.1, 11.3]"
+gemini,guessing: invalid share,,183,"73.2 [65.7, 80.5]"
+gemini,guessing: refusal share,,183,"67.2 [60.2, 73.9]"
+gemini,A4 empty or refusal,0,,
+gemini,two-way split A share (en_unique P-NAME),,477,"36.1 [29.4, 42.6]"
+gemini,"D204 sibling labels on HT-6 pairs, in the budget",5,,
+gemini,D204 N-BB sibling labels on HT-6 pairs,6,58,
+gemini,D204 N-BE sibling labels on HT-6 pairs,13,132,
+gemini,D204 N-BBs sibling labels on HT-6 pairs,4,78,
+qwen,A1,0,460,"0.0 [0.0, 0.0]"
+qwen,A2,13,460,"2.8 [1.0, 5.2]"
+qwen,A3,5,460,"1.1 [0.2, 2.1]"
+qwen,A4,90,460,"19.6 [15.5, 23.5]"
+qwen,B,165,460,"35.9 [31.3, 41.0]"
+qwen,C,187,460,"40.7 [34.9, 46.6]"
+qwen,guessing level N-FCB0 (not A),,352,"23.6 [18.6, 28.5]"
+qwen,guessing: invalid share,,352,"0.0 [0.0, 0.0]"
+qwen,guessing: refusal share,,352,"0.0 [0.0, 0.0]"
+qwen,A4 empty or refusal,0,,
+qwen,two-way split A share (en_unique P-NAME),,803,"32.3 [28.3, 36.1]"
+qwen,"D204 sibling labels on HT-6 pairs, in the budget",0,,
+qwen,D204 N-BB sibling labels on HT-6 pairs,0,30,
+qwen,D204 N-BE sibling labels on HT-6 pairs,13,149,
+qwen,D204 N-BBs sibling labels on HT-6 pairs,0,18,
+gemma,A1,0,337,"0.0 [0.0, 0.0]"
+gemma,A2,9,337,"2.7 [0.9, 4.6]"
+gemma,A3,7,337,"2.1 [0.3, 4.1]"
+gemma,A4,54,337,"16.0 [11.7, 20.6]"
+gemma,B,199,337,"59.1 [53.3, 64.9]"
+gemma,C,68,337,"20.2 [15.8, 25.0]"
+gemma,guessing level N-FCB0 (not A),,267,"3.7 [1.8, 6.2]"
+gemma,guessing: invalid share,,267,"89.5 [85.0, 93.5]"
+gemma,guessing: refusal share,,267,"89.5 [85.0, 93.5]"
+gemma,A4 empty or refusal,0,,
+gemma,two-way split A share (en_unique P-NAME),,590,"20.8 [17.3, 24.5]"
+gemma,"D204 sibling labels on HT-6 pairs, in the budget",5,,
+gemma,D204 N-BB sibling labels on HT-6 pairs,5,85,
+gemma,D204 N-BE sibling labels on HT-6 pairs,15,142,
+gemma,D204 N-BBs sibling labels on HT-6 pairs,10,115,
+HT-5,C answers gold or visibility (pooled),,140,"0.7 [0.0, 2.3]"

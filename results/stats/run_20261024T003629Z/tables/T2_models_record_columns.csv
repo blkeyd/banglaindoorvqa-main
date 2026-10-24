@@ -1,0 +1,11 @@
+﻿model,model_key,model_id,model_version,model_revision,mode,prompt_version,experiment,answers,first_answer_utc,last_answer_utc
+Gemini 3.6 Flash,gemini,gemini-3.6-flash,gemini-3.6-flash,-,batch,exp-v1,EXP-L,6708,2026-10-21T02:04:47Z,2026-10-21T02:18:13Z
+Gemini 3.6 Flash,gemini,gemini-3.6-flash,gemini-3.6-flash,-,batch,exp-v1,EXP-N,4892,2026-10-21T03:34:11Z,2026-10-21T03:46:04Z
+Qwen3.5-4B,qwen,Qwen/Qwen3.5-4B,-,851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a,hf; reuse,exp-v1,EXP-L,6708,2026-10-20T20:38:15Z,2026-10-20T21:51:33Z
+Qwen3.5-4B,qwen,Qwen/Qwen3.5-4B,-,851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a,hf; reuse,exp-v1,EXP-N,4892,2026-10-21T04:04:20Z,2026-10-21T05:14:51Z
+Qwen3.5-4B,qwen,Qwen/Qwen3.5-4B,-,851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a,hf; reuse,exp-v1,EXP-R,4347,2026-10-21T12:13:46Z,2026-10-21T12:55:25Z
+Gemma 4 E4B,gemma,google/gemma-4-E4B-it,-,ee0ef6023621cff504d758262d4e04895a5af4a2,hf,exp-v1,EXP-L,6708,2026-10-20T21:56:16Z,2026-10-20T23:23:07Z
+Gemma 4 E4B,gemma,google/gemma-4-E4B-it,-,ee0ef6023621cff504d758262d4e04895a5af4a2,hf,exp-v1,EXP-N,4892,2026-10-21T05:26:42Z,2026-10-21T07:07:50Z
+Qwen3.5-4B LoRA s42,qwen_ft_s42,Qwen/Qwen3.5-4B+ft-s42,-,851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a,hf,exp-v1,EXP-R,4347,2026-10-21T12:56:01Z,2026-10-21T14:07:33Z
+Qwen3.5-4B LoRA s43,qwen_ft_s43,Qwen/Qwen3.5-4B+ft-s43,-,851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a,hf,exp-v1,EXP-R,4347,2026-10-21T14:08:05Z,2026-10-21T15:17:48Z
+Qwen3.5-4B LoRA s44,qwen_ft_s44,Qwen/Qwen3.5-4B+ft-s44,-,851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a,hf,exp-v1,EXP-R,4347,2026-10-21T15:18:51Z,2026-10-21T18:07:10Z

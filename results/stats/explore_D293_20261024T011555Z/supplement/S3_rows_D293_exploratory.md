@@ -1,0 +1,7 @@
+# S3, exploratory rows (D293): P7 with every Bangla answer labelled English copy counted as transferred; the pre-specified P7 stays primary
+
+| model | group | items named in English (en_route yes / no) | primary P7 pp [95% CI] | bound P7 pp [95% CI] | p (bound) | Holm p (bound in the family) | bound transfer % yes / no [95% CI] | English copies among them (yes / no) |
+|---|---|---|---|---|---|---|---|---|
+| Gemini 3.6 Flash | P7 with English copies counted as transferred (exploratory, D293) | 446 / 300 | -16.7 [-22.6, -10.8] | -10.9 [-17.1, -5.0] | < 0.0002 | 0.0012 | 77.8 [72.9, 82.5] / 88.7 [84.6, 92.7] | 72 / 31 |
+| Qwen3.5-4B | P7 with English copies counted as transferred (exploratory, D293) | 331 / 258 | -1.2 [-10.9, 8.1] | -1.8 [-10.6, 6.9] | 0.6930 | 1.0000 | 39.3 [33.2, 45.1] / 41.1 [34.1, 47.8] | 21 / 18 |
+| Gemma 4 E4B | P7 with English copies counted as transferred (exploratory, D293) | 333 / 234 | -16.6 [-24.9, -8.4] | -18.8 [-26.0, -11.7] | < 0.0002 | < 0.0012 | 66.7 [60.1, 72.8] / 85.5 [80.6, 89.8] | 17 / 17 |
