@@ -21,6 +21,10 @@ Commands
     budget-items  the HT-5 sampling frame: error-budget category per model and
                   item (ids only), from the scored files alone.
     run           every analysis, figure and table; --mode placeholder or real.
+    sens-d279     D290, added after the tag gate-E: the D279 scorer sensitivity
+                  pass (rules a and b of scored/main/sensitivity_D279/changes.csv)
+                  beside the primary run, with the same resamples; table S11.
+                  Real mode needs --deviation "D290: ...".
 
 Rules kept here
     - Seed 42; 10,000 bootstrap resamples (the real run refuses other values).
@@ -45,7 +49,7 @@ from collections import Counter, defaultdict
 from pathlib import Path
 from types import SimpleNamespace
 
-SCRIPT_VERSION = "analysis-2026-10-17"
+SCRIPT_VERSION = "analysis-2026-10-24"
 REPO_DEFAULT = Path(__file__).resolve().parents[1]
 DRIVE_DEFAULT = Path("/content/drive/MyDrive/BanglaIndoorVQA")
 sys.path.insert(0, str(REPO_DEFAULT / "src"))
@@ -1613,6 +1617,528 @@ def cmd_selftest(args):
 
 
 # --------------------------------------------------------------------------
+# 5b. D279 scorer sensitivity pass (D290; added after the tag gate-E)
+# --------------------------------------------------------------------------
+#
+# The frozen scorer stays primary (D279). Drive scored/main/sensitivity_D279/
+# changes.csv holds every answer that rules a and b score differently, with
+# the old and the new label, strict, lenient and content_lang_ok. This pass
+# lays those four values over the primary records in memory (every other
+# record field stays as scored), checks each row against its primary record,
+# and runs the pre-specified functions of src/stats.py on both record sets
+# with the same house resamples. It first reproduces the primary run's numbers
+# exactly, then writes supplement table S11. No input is changed.
+
+D279_VERSION = "analysis-d279-2026-10-24"
+D279_COLUMNS = ("rule", "model_key", "condition_id", "qa_id", "key", "label", "label_sens", "strict",
+                "strict_sens", "lenient", "lenient_sens", "content_lang_ok", "content_lang_ok_sens")
+D279_BY_COND_COLUMNS = ("model_key", "condition_id", "n", "changed_a", "changed_b", "strict_delta",
+                        "lenient_delta")
+D279_FIELDS = ("label", "strict", "lenient", "content_lang_ok")
+D279_PINS = {"changes.csv": "6f8e9bc759328f3142c30e427f4c0ff5372a1f4a7113b663de950bafdcc9672a",
+             "summary.json": "1a8d15ed57c671a4c310341f3e6151acf8743201c1baea6101f76b636094205e",
+             "by_condition.csv": "741b6e9d95fdbedb8c54abf6f9359edf720f10f2f984d043523c2925973303d6"}
+D279_EXPECT = {"rows": 304, "a": 294, "b": 10, "gold_moved": 0}      # addendum O2
+D279_CONTRASTS = ("P1", "P2", "P12", "P3", "P4", "P5", "P6", "P7")
+D279_TESTED = ("P12", "P3", "P4", "P5", "P6", "P7")                    # Holm family (Design 9.1)
+D279_PRIMARY_SCRIPT = "analysis-2026-10-17"                            # the gate-E script
+D279_TOL = 1e-12        # the same code, records and resamples: equal up to rounding
+D279_NEAR = 1e-9        # another CPU can change the last digits of a sum; then a p may move by a resample
+
+
+def _d279_str(v):
+    """A record value as the scoring audit wrote it into changes.csv."""
+    return "" if v is None else str(v)
+
+
+def _d279_num(s):
+    if s in ("True", "False"):
+        return int(s == "True")
+    f = float(s)
+    return int(f) if f.is_integer() else f
+
+
+def _d279_bool(s):
+    if s in ("True", "False", ""):
+        return {"True": True, "False": False, "": None}[s]
+    raise ValueError(s)
+
+
+def _d279_model_of(path):
+    name = os.path.basename(str(path))
+    if not name.endswith("_scored.jsonl"):
+        return name
+    name = name[:-len("_scored.jsonl")]
+    return name[3:] if name.startswith("ph_") else name
+
+
+def d279_read_changes(path, world, recs, checks):
+    """Every row of changes.csv against its primary record. Returns the overlay
+    {(model, condition, qa_id): new values} and the per-cell counts."""
+    overlay, cells, by_rule = {}, defaultdict(Counter), Counter()
+    hdr = S.csv_header(path)
+    if hdr != list(D279_COLUMNS):
+        checks.add("FAIL", "D279 changes.csv columns", "%s; expected %s" % (hdr, list(D279_COLUMNS)))
+        return overlay, cells, by_rule, 0
+    rows = S.read_csv_dicts(path)
+    problems, seen = Counter(), set()
+    for r in rows:
+        m, c, q, rule = r["model_key"], r["condition_id"], r["qa_id"], r["rule"]
+        rec = recs.data.get((m, c), {}).get(q)
+        if rule not in ("a", "b"):
+            problems["rule is not a or b"] += 1
+            continue
+        if rec is None:
+            problems["no primary record for the model, condition and item"] += 1
+            continue
+        if (m, c, q) in seen:
+            problems["the same answer twice"] += 1
+            continue
+        seen.add((m, c, q))
+        if rec["gold_status"] != "ok" or world.items[q]["excluded"]:
+            problems["an excluded or unscored item"] += 1
+            continue
+        if r["key"] != "|".join([_d279_str(rec["model_id"]), c, _d279_str(rec["prompt_version"]), q]):
+            problems["key is not model_id|condition_id|prompt_version|qa_id of the record"] += 1
+            continue
+        if tuple(r[k] for k in D279_FIELDS) != tuple(_d279_str(rec[k]) for k in D279_FIELDS):
+            problems["old label, strict, lenient or content_lang_ok differ from the scored file"] += 1
+            continue
+        try:
+            new = {"label": r["label_sens"], "strict": _d279_num(r["strict_sens"]),
+                   "lenient": _d279_num(r["lenient_sens"]), "content_lang_ok": _d279_bool(r["content_lang_ok_sens"])}
+        except ValueError:
+            problems["a new value that does not parse"] += 1
+            continue
+        if new["strict"] not in (0, 1) or not 0 <= new["lenient"] <= 1:
+            problems["a new strict or lenient outside 0 to 1"] += 1
+            continue
+        if rule == "a" and (rec["task"] == "fc" or rec["kind"] != "naming" or new["label"] not in S.LABELS_NAMING):
+            problems["rule a on an answer that is not an open naming answer"] += 1
+            continue
+        if rule == "b" and (c not in S.COND_N_FC or rec["task"] != "fc" or rec["refusal_phrase"] is not True
+                            or rec["fc_valid"] is not True or new["label"] != "invalid" or new["strict"] != 0
+                            or new["lenient"] != 0 or new["content_lang_ok"] != rec["content_lang_ok"]):
+            problems["rule b on an answer outside its definition"] += 1
+            continue
+        if (new["label"], new["strict"], new["lenient"]) == (rec["label"], rec["strict"], rec["lenient"]):
+            problems["a row that changes nothing"] += 1
+            continue
+        overlay[(m, c, q)] = new
+        by_rule[rule] += 1
+        cell = cells[(m, c)]
+        cell["changed_" + rule] += 1
+        cell["strict_delta"] += new["strict"] - (rec["strict"] or 0)
+        cell["lenient_delta"] += new["lenient"] - (rec["lenient"] or 0)
+    checks.check(not problems and len(overlay) == len(rows), "D279 changes.csv rows",
+                 "%d rows (rule a %d, rule b %d) in %d model-condition cells; rows that do not match their"
+                 " primary record %d%s" % (len(rows), by_rule["a"], by_rule["b"], len(cells), sum(problems.values()),
+                                          (": " + "; ".join("%s %d" % kv for kv in sorted(problems.items())))
+                                          if problems else ""))
+    return overlay, cells, by_rule, len(rows)
+
+
+def d279_check_by_condition(path, cells, recs, checks):
+    hdr = S.csv_header(path)
+    if hdr != list(D279_BY_COND_COLUMNS):
+        checks.add("FAIL", "D279 by_condition.csv", "columns %s; expected %s" % (hdr, list(D279_BY_COND_COLUMNS)))
+        return
+    rows = S.read_csv_dicts(path)
+    bad, seen = [], set()
+    for r in rows:
+        k = (r["model_key"], r["condition_id"])
+        seen.add(k)
+        slot = recs.data.get(k)
+        n_ok = sum(1 for x in slot.values() if x["gold_status"] == "ok") if slot else None
+        want = cells.get(k, Counter())
+        try:
+            got = tuple(_d279_num(r[c]) for c in ("n", "changed_a", "changed_b", "strict_delta", "lenient_delta"))
+        except ValueError:
+            bad.append("%s %s" % k)
+            continue
+        if got != (n_ok, want["changed_a"], want["changed_b"], want["strict_delta"], want["lenient_delta"]):
+            bad.append("%s %s" % k)
+    missing = sorted("%s %s" % k for k in set(cells) - seen)
+    checks.check(not bad and not missing, "D279 by_condition.csv",
+                 "%d cells; n, answers changed per rule, strict and lenient change equal changes.csv and the"
+                 " scored files: %s%s" % (len(rows), "yes" if not bad else "no (%s)" % ", ".join(bad[:6]),
+                                          "; cells missing %s" % ", ".join(missing[:6]) if missing else ""))
+
+
+def d279_overlay(recs, overlay):
+    """New Records: the primary slots, with the four D279 values laid over the
+    changed answers (copies; the primary records stay as they are)."""
+    data = {}
+    for key, slot in recs.data.items():
+        hit = {q: v for (m, c, q), v in overlay.items() if (m, c) == key}
+        if not hit:
+            data[key] = slot
+            continue
+        ns = dict(slot)
+        for q, v in hit.items():
+            nr = dict(slot[q])
+            nr.update(v)
+            ns[q] = nr
+        data[key] = ns
+    return S.Records(data=data, stage=recs.stage, scorer_version=recs.scorer_version,
+                     prompt_version=recs.prompt_version, files=recs.files, manifests=recs.manifests,
+                     seeds=recs.seeds)
+
+
+def d279_analyses(world, recs, boots, b0):
+    """The pre-specified functions, as cmd_run calls them, for one record set."""
+    boot_l, boot_n, boot_r, boot_p7 = boots
+    L = S.analyse_exp_l(world, recs, boot_l, b0)
+    N = S.analyse_exp_n(world, recs, boot_n, boot_p7)
+    R = S.analyse_exp_r(world, recs, boot_r)
+    budget = {m: S.error_budget(world, recs, m, boot_n) for m in S.MODELS}
+    fc = {m: S.analyse_fc(world, recs, m, boot_n) for m in S.MODELS}
+    contrasts, holm_ = {}, {}
+    for m in S.MODELS:
+        c = dict(L["models"][m]["contrasts"])
+        c.update(N["models"][m]["contrasts"])
+        contrasts[m] = c
+        holm_[m] = S.holm_bootstrap({k: c[k] for k in D279_TESTED if k in c})
+    return {"contrasts": contrasts, "holm": holm_, "P8": R.get("P8"), "seeds": R.get("seeds", []),
+            "budget": {m: {"A_share": b["A_share"], "counts": b["counts"], "n_denominator": b["n_denominator"]}
+                       for m, b in budget.items()},
+            "fc": {m: {probe: {c: {k: block[c][k] for k in ("n", "accuracy", "invalid", "refusal")}
+                               for c in block if c.startswith("N-FC")} for probe, block in fc[m].items()}
+                   for m in S.MODELS}}
+
+
+def _d279_level(kind, a, b, n_boot):
+    """0: equal up to rounding; 1: equal up to the last digits of another CPU (a p
+    may then move by a resample or two); 2: different."""
+    if a is None or b is None:
+        return 0 if a is None and b is None else 2
+    if isinstance(a, bool) or isinstance(b, bool) or kind == "n_undefined":
+        return 0 if a == b else 2
+    d = abs(float(a) - float(b))
+    if d <= D279_TOL * max(1.0, abs(float(a)), abs(float(b))):
+        return 0
+    near = {"p": 2.5 / n_boot, "p_floor": 0.0, "holm": 15.0 / n_boot}.get(kind, D279_NEAR)
+    return 1 if d <= near else 2
+
+
+def d279_compare_primary(prim, nums, n_boot):
+    """Every quantity of S11 recomputed on the primary records against the
+    primary run's numbers.json. Returns (number compared, last-digit
+    differences, real differences)."""
+    n, near, far = 0, [], []
+
+    def note(where, kind, a, b):
+        nonlocal n
+        n += 1
+        lev = _d279_level(kind, a, b, n_boot)
+        if lev:
+            (near if lev == 1 else far).append("%s %s" % (where, kind))
+
+    def est(where, s, t):
+        t = t or {}
+        for k in ("point", "lo", "hi", "n_undefined", "p", "p_floor"):
+            if k in s or k in t:
+                note(where, k, s.get(k), t.get(k))
+    for m in S.MODELS:
+        for k in D279_CONTRASTS:
+            est("%s %s" % (m, k), prim["contrasts"][m][k], nums.get("contrasts", {}).get(m, {}).get(k))
+        for k, h in prim["holm"][m].items():
+            t = nums.get("holm", {}).get(m, {}).get(k) or {}
+            note("%s %s" % (m, k), "holm", h["p"], t.get("p"))
+            note("%s %s" % (m, k), "bound", h["bound"], t.get("bound"))
+        b, t = prim["budget"][m], nums.get("budget", {}).get(m, {})
+        est("%s budget A share" % m, b["A_share"], t.get("A_share"))
+        n += 1
+        if b["counts"] != t.get("counts") or b["n_denominator"] != t.get("n_denominator"):
+            far.append("%s budget counts" % m)
+        for probe, block in prim["fc"][m].items():
+            for c, v in block.items():
+                for k in ("accuracy", "invalid", "refusal"):
+                    est("%s %s %s" % (m, c, k), v[k], nums.get("fc", {}).get(m, {}).get(probe, {}).get(c, {}).get(k))
+    if prim["P8"] is not None:
+        est("P8", prim["P8"], nums.get("exp_r", {}).get("P8"))
+    return n, near, far
+
+
+def d279_reported_primary(nums):
+    """The primary values as the primary run reported them (numbers.json), in
+    the shape of d279_analyses, so S11 shows exactly the numbers of T4, S2 and F3."""
+    r = nums.get("exp_r") or {}
+    return {"contrasts": {m: {k: nums["contrasts"][m][k] for k in D279_CONTRASTS} for m in S.MODELS},
+            "holm": {m: dict(nums["holm"][m]) for m in S.MODELS}, "P8": r.get("P8"), "seeds": r.get("seeds", []),
+            "budget": {m: {k: nums["budget"][m][k] for k in ("A_share", "counts", "n_denominator")} for m in S.MODELS},
+            "fc": {m: {probe: {c: {k: block[c][k] for k in ("n", "accuracy", "invalid", "refusal")}
+                               for c in block if c.startswith("N-FC")} for probe, block in nums["fc"][m].items()}
+                   for m in S.MODELS}}
+
+
+def d279_cell_strict(world, recs, cells):
+    """Strict accuracy (point) of every changed cell, over its scored items."""
+    out = {}
+    for (m, c) in cells:
+        ids = world.scored_ids[world.probe_of(c)]
+        slot = recs.get(m, c)
+        out["%s|%s" % (m, c)] = sum(S.strict_of(slot[q]) for q in ids) / len(ids)
+    return out
+
+
+def _d279_excl(s):
+    if s is None or s.get("lo") is None or s.get("hi") is None:
+        return "-"
+    return "yes" if s["lo"] > 0 or s["hi"] < 0 else "no"
+
+
+def _d279_chg(a, b):
+    if a is None or b is None or a.get("point") is None or b.get("point") is None:
+        return "-"
+    return "%+.2f" % (100.0 * (b["point"] - a["point"]))
+
+
+def d279_s11_rows(prim, sens, cells, fc_rule_b):
+    rows = []
+    for m in S.MODELS:
+        for k in D279_CONTRASTS:
+            a, b = prim["contrasts"][m][k], sens["contrasts"][m][k]
+            ha, hb = prim["holm"][m].get(k), sens["holm"][m].get(k)
+            rows.append([S.MODEL_NAMES[m], k, S.ci_text(a), S.ci_text(b), _d279_chg(a, b),
+                         S.fmt_ps(a) if "p" in a else "", S.fmt_ps(b) if "p" in b else "",
+                         S.fmt_holm(ha) if ha else "", S.fmt_holm(hb) if hb else "",
+                         "%s / %s" % (_d279_excl(a), _d279_excl(b)),
+                         ("Holm within the model over P12, P3 to P7" if k in D279_TESTED else "estimate, no test")
+                         + ("; fidelity is not in changes.csv and stays as scored" if k == "P4" else "")])
+    if prim["P8"] is not None and sens["P8"] is not None:
+        a, b = prim["P8"], sens["P8"]
+        rows.append(["%s fine-tuned (%d seeds)" % (S.MODEL_NAMES[S.FT_BASE], len(prim["seeds"])), "P8",
+                     S.ci_text(a), S.ci_text(b), _d279_chg(a, b), S.fmt_ps(a), S.fmt_ps(b), "", "",
+                     "%s / %s" % (_d279_excl(a), _d279_excl(b)), "single test (Design 9.1)"])
+    for m in S.MODELS:
+        a, b = prim["budget"][m], sens["budget"][m]
+        cnt = lambda x: ", ".join("%s %d" % (k, x["counts"][k]) for k in S.BUDGET_CATS)
+        rows.append([S.MODEL_NAMES[m], "error budget A share (F3)", S.ci_text(a["A_share"]), S.ci_text(b["A_share"]),
+                     _d279_chg(a["A_share"], b["A_share"]), "", "", "", "", "",
+                     "denominator %d / %d; primary %s; D279 %s" % (a["n_denominator"], b["n_denominator"],
+                                                                   cnt(a), cnt(b))])
+    for (m, c), n_b in sorted(fc_rule_b.items(), key=lambda kv: (S.MODELS.index(kv[0][0]),
+                                                                 S.COND_N_FC.index(kv[0][1]))):
+        probe = next(p for p, block in prim["fc"][m].items() if c in block)
+        a, b = prim["fc"][m][probe][c], sens["fc"][m][probe][c]
+        rows.append([S.MODEL_NAMES[m], "%s accuracy (%s, n %d)" % (c, probe, a["n"]), S.ci_text(a["accuracy"]),
+                     S.ci_text(b["accuracy"]), _d279_chg(a["accuracy"], b["accuracy"]), "", "", "", "", "",
+                     "%d answers made invalid by rule b; invalid share %s to %s; refusal share %s (as scored)"
+                     % (n_b, S.ci_text(a["invalid"]), S.ci_text(b["invalid"]), S.ci_text(a["refusal"]))])
+    return rows
+
+
+def d279_report(meta, prim, sens, s11_rows, overlay_info, ph):
+    P = "[PLACEHOLDER] " if ph else ""
+    lines = ["# %sD279 scorer sensitivity (S11)" % ("PLACEHOLDER: made-up data, these numbers are not results. "
+                                                   if ph else ""), "",
+             "script %s (pass %s), stats %s, scorer %s, prompt %s, UTC %s, mode %s" % (
+                 SCRIPT_VERSION, D279_VERSION, S.STATS_VERSION, meta["scorer_version"], meta["prompt_version"],
+                 meta["utc"], meta["mode"]),
+             "deviation: %s" % (meta["deviation"] or "-"),
+             "bootstrap: %d resamples, seed %d, the same house resamples as the primary run" % (meta["n_boot"], S.SEED),
+             "primary run: %s; %d quantities recomputed on the primary records, differences %d (last digits"
+             " only %d); the primary columns show the values the primary run reported" % (
+                 meta["primary_run"], meta["primary_compared"], len(meta["primary_diffs"]),
+                 len(meta["primary_last_digit_diffs"])),
+             "", "## Change file",
+             "%s%d answers changed (rule a %d, rule b %d) in %d model-condition cells; every row equals its primary"
+             " record before the change; label, strict, lenient and content_lang_ok are taken from the file, every"
+             " other field (fidelity, refusal, named objects) stays as scored" % (
+                 P, overlay_info["rows"], overlay_info["a"], overlay_info["b"], overlay_info["cells"]),
+             "", "## Contrasts, percentage points [95% CI]; primary, then D279 rules a and b"]
+    for r in s11_rows:
+        lines.append("%s%s %s: %s; D279 %s; change %s; Holm %s, %s; CI excludes 0: %s" % (
+            P, r[0], r[1], r[2], r[3], r[4], r[7] or "-", r[8] or "-", r[9] or "-"))
+    flips = []
+    for m in S.MODELS:
+        for k in D279_CONTRASTS:
+            a, b = prim["contrasts"][m][k], sens["contrasts"][m][k]
+            if _d279_excl(a) != _d279_excl(b):
+                flips.append("%s %s (CI excludes 0: %s to %s)" % (S.MODEL_NAMES[m], k, _d279_excl(a), _d279_excl(b)))
+            ha, hb = prim["holm"][m].get(k), sens["holm"][m].get(k)
+            if ha and hb and ((ha["p"] < 0.05) != (hb["p"] < 0.05)):
+                flips.append("%s %s (Holm p %s to %s)" % (S.MODEL_NAMES[m], k, S.fmt_holm(ha), S.fmt_holm(hb)))
+    if prim["P8"] is not None and sens["P8"] is not None:
+        if _d279_excl(prim["P8"]) != _d279_excl(sens["P8"]):
+            flips.append("P8 (CI excludes 0: %s to %s)" % (_d279_excl(prim["P8"]), _d279_excl(sens["P8"])))
+        pa, pb = prim["P8"].get("p"), sens["P8"].get("p")
+        if pa is not None and pb is not None and (pa < 0.05) != (pb < 0.05):
+            flips.append("P8 (p %s to %s)" % (S.fmt_ps(prim["P8"]), S.fmt_ps(sens["P8"])))
+    lines += ["", "## Readings that change between the two scorings",
+              "%s%s" % (P, "; ".join(flips) if flips else "none: every CI keeps its side of 0 and every Holm p"
+                                                                " keeps its side of 0.05"), ""]
+    return "\n".join(lines) + "\n", flips
+
+
+def cmd_sens_d279(args):
+    t0 = time.time()
+    mode = args.mode
+    ph = mode == "placeholder"
+    if mode == "real" and (args.boot != S.N_BOOT or args.allow_other_inputs):
+        say("STOP: the real run uses 10,000 resamples and the pinned inputs (D232)")
+        return 2
+    if mode == "real" and not (args.deviation or "").startswith("D290"):
+        say("STOP: this pass was added after the tag gate-E; give --deviation \"D290: <reason>\" (D230)")
+        return 2
+    say("analysis sens-d279 (%s, pass %s, %s, mode %s, UTC %s)" % (SCRIPT_VERSION, D279_VERSION, S.STATS_VERSION,
+                                                                   mode, S.now_utc()))
+    checks = S.Checks(soften=args.allow_other_inputs and ph)
+    paths = paths_from(args)
+    S.guard_out(args.out, mode, paths.repo, paths.drive)          # before any work
+    d279_dir = Path(args.changes).parent if args.changes else \
+        Path(args.drive) / "scored" / "main" / "sensitivity_D279"
+    fpath = {"changes.csv": Path(args.changes) if args.changes else d279_dir / "changes.csv",
+             "summary.json": Path(args.d279_summary) if args.d279_summary else d279_dir / "summary.json",
+             "by_condition.csv": Path(args.d279_by_condition) if args.d279_by_condition
+             else d279_dir / "by_condition.csv"}
+    world = S.build_world(paths, checks, need_dataset=True, soften=checks.soften)
+    recs = S.load_scored(args.scored, world, checks, mode)
+    if mode == "real":
+        real_mode_checks(paths, checks, args.deviation)
+    fsha = {}
+    for name, p in fpath.items():
+        if not p.exists():
+            checks.add("FAIL", "D279 %s" % name, "missing: %s" % p)
+            continue
+        fsha[name] = S.sha256_file(p)
+        checks.check(fsha[name] == D279_PINS[name], "D279 %s" % name, "sha256 %s... (%s)" % (
+            fsha[name][:12], "the pinned file" if fsha[name] == D279_PINS[name] else "not the pinned file %s..."
+            % D279_PINS[name][:12]), pinned=True)
+    if len(fsha) < 3:
+        say("sens-d279: %d FAIL; nothing written" % checks.count("FAIL"))
+        return 1
+    overlay, cells, by_rule, n_rows = d279_read_changes(fpath["changes.csv"], world, recs, checks)
+    d279_check_by_condition(fpath["by_condition.csv"], cells, recs, checks)
+    js = json.loads(fpath["summary.json"].read_text(encoding="utf-8-sig"))
+    shas = {_d279_model_of(f["file"]): f["sha256"] for f in recs.files}
+    checks.check(js.get("scored_sha256") == shas, "D279 summary.json scored files",
+                 "the change file was made from the scored files read here: %s" % (js.get("scored_sha256") == shas))
+    checks.check(js.get("changed") == n_rows and js.get("by_rule") == dict(by_rule) and js.get("gold_moved") == 0,
+                 "D279 summary.json counts", "changed %s, by rule %s, gold moved %s; changes.csv %d rows %s" % (
+                     js.get("changed"), js.get("by_rule"), js.get("gold_moved"), n_rows, dict(by_rule)))
+    if mode == "real":
+        got = {"rows": n_rows, "a": by_rule["a"], "b": by_rule["b"], "gold_moved": js.get("gold_moved")}
+        checks.check(got == D279_EXPECT, "D279 counts (addendum O2)", "%s; expected %s" % (got, D279_EXPECT))
+    # The primary run this pass stands beside
+    prun = Path(args.primary_run)
+    sfx = "_PLACEHOLDER" if ph else ""
+    nums_p, man_p = prun / ("numbers%s.json" % sfx), prun / "manifest.json"
+    nums = man = None
+    if nums_p.exists() and man_p.exists():
+        nums = json.loads(nums_p.read_text(encoding="utf-8"))
+        man = json.loads(man_p.read_text(encoding="utf-8"))
+        files_same = sorted((os.path.basename(f["file"]), f["sha256"]) for f in man.get("scored_files", [])) == \
+            sorted((os.path.basename(f["file"]), f["sha256"]) for f in recs.files)
+        want_head = S.git_out(paths.repo, "rev-parse", "--short=12", "gate-E^{commit}") if mode == "real" else None
+        ok = (man.get("mode") == mode and man.get("failed") == [] and man.get("script_version") == D279_PRIMARY_SCRIPT
+              and man.get("stats_version") == S.STATS_VERSION and man.get("n_boot") == args.boot
+              and man.get("seed") == S.SEED and not man.get("deviation") and files_same
+              and (mode != "real" or (want_head and man.get("git_head") == want_head)))
+        checks.check(ok, "primary run (gate-E code)", "%s: mode %s, script %s, failed stages %d, resamples %s,"
+                     " deviation %s, git head %s, same scored files %s" % (
+                         prun.name, man.get("mode"), man.get("script_version"), len(man.get("failed") or []),
+                         man.get("n_boot"), man.get("deviation") or "none", man.get("git_head"), files_same))
+    else:
+        checks.add("FAIL", "primary run (gate-E code)", "no %s and manifest.json in %s" % (nums_p.name, prun))
+    if checks.count("FAIL"):
+        say("sens-d279: %d FAIL before the analysis; nothing written. Fix the inputs first." % checks.count("FAIL"))
+        return 1
+    out = S.guard_out(args.out, mode, paths.repo, paths.drive) / ("sens_D279_%s%s" % (S.utc_stamp(), sfx))
+    out.mkdir(parents=True, exist_ok=False)
+    say("output folder: %s" % out)
+    B = args.boot
+    boots = (S.HouseBoot(world.houses_of(world.scored_ids["P-CORE-CLOSED"]), n_boot=B, name="EXP-L"),
+             S.HouseBoot(world.houses_of(world.scored_ids["P-NAME"]), n_boot=B, name="EXP-N"),
+             S.HouseBoot(world.houses_of(world.scored_ids["R-TEST"]), n_boot=B, name="EXP-R"),
+             S.HouseBoot(world.houses_of([p[0] for p in S.p7_items(world)]), n_boot=B, name="P7"))
+    b0 = S.compute_b0(world)
+    sens_recs = d279_overlay(recs, overlay)
+    t = time.time()
+    prim = d279_analyses(world, recs, boots, b0)
+    say("  %-28s done (%.1f s)" % ("primary records", time.time() - t))
+    t = time.time()
+    sens = d279_analyses(world, sens_recs, boots, b0)
+    say("  %-28s done (%.1f s)" % ("D279 records", time.time() - t))
+    n_cmp, near, diffs = d279_compare_primary(prim, nums, B)
+    if near and not diffs:
+        checks.add("WARN", "primary numbers reproduced", "%d quantities of S11 recomputed on the primary records;"
+                   " %d differ from %s in the last digits only (%s; another CPU?); S11 shows the reported values"
+                   % (n_cmp, len(near), nums_p.name, ", ".join(near[:4])))
+    else:
+        checks.check(not diffs, "primary numbers reproduced", "%d quantities of S11 recomputed on the primary"
+                     " records equal %s: %s" % (n_cmp, nums_p.name, "yes" if not diffs else
+                                                "no (%s)" % ", ".join(diffs[:6])))
+    prim_calc, prim = prim, (d279_reported_primary(nums) if not diffs else prim)
+    cs_p, cs_s = d279_cell_strict(world, recs, cells), d279_cell_strict(world, sens_recs, cells)
+    bad_cells = [k for k in cs_p if abs((cs_s[k] - cs_p[k]) - cells[tuple(k.split("|"))]["strict_delta"]
+                                        / len(world.scored_ids[world.probe_of(k.split("|")[1])])) > 1e-12]
+    checks.check(not bad_cells, "cell accuracy changes", "strict accuracy change of the %d changed cells equals"
+                 " strict_delta / n: %s" % (len(cs_p), "yes" if not bad_cells else "no (%s)" % ", ".join(bad_cells)))
+    pts = js.get("exp_l_contrast_change_points") or {}
+    bad_pts = ["%s %s" % (m, k) for m in S.MODELS for k in ("P1", "P2", "P12", "P3")
+               if pts.get(m, {}).get(k) is None or abs((sens["contrasts"][m][k]["point"]
+                                                       - prim_calc["contrasts"][m][k]["point"]) - pts[m][k]) > 1e-9]
+    checks.check(not bad_pts, "EXP-L contrast changes = summary.json", "P1, P2, P12, P3 point changes of the"
+                 " three models equal the scoring audit's values: %s" % ("yes" if not bad_pts else
+                                                                        "no (%s)" % ", ".join(bad_pts)))
+    fc_rule_b = Counter()
+    for (m, c, q), v in overlay.items():
+        if c in S.COND_N_FC:
+            fc_rule_b[(m, c)] += 1
+    s11 = d279_s11_rows(prim, sens, cells, fc_rule_b)
+    tab = S.write_table(out / "supplement" / "S11_scorer_sensitivity_D279",
+                        ["model", "quantity", "primary pp [95% CI]", "D279 rules a and b pp [95% CI]", "change pp",
+                         "p primary", "p D279", "Holm p primary", "Holm p D279", "CI excludes 0 (primary / D279)",
+                         "note"], s11, ph,
+                        "S11. Scorer sensitivity (D279): every primary contrast, the error-budget A share and the"
+                        " forced-choice cells rule b changes, under the frozen scorer and under rules a and b")
+    utc = S.now_utc()
+    added_deleted = S.git_out(paths.repo, "diff", "--numstat", "gate-E", "--", "scripts/analysis.py") or ""
+    meta = {"mode": mode, "utc": utc, "script_version": SCRIPT_VERSION, "d279_version": D279_VERSION,
+            "stats_version": S.STATS_VERSION, "scorer_version": recs.scorer_version,
+            "prompt_version": recs.prompt_version, "stage": recs.stage, "n_boot": B, "seed": S.SEED,
+            "deviation": args.deviation or "", "primary_run": prun.name, "primary_compared": n_cmp,
+            "primary_diffs": diffs, "primary_last_digit_diffs": near,
+            "git_head": S.git_out(paths.repo, "rev-parse", "--short=12", "HEAD") or "unknown",
+            "gate_e_commit": S.git_out(paths.repo, "rev-parse", "--short=12", "gate-E^{commit}") or "unknown",
+            "analysis_py_vs_gate_e_numstat": added_deleted.split("\t")[:2] if added_deleted else None}
+    oinfo = {"rows": n_rows, "a": by_rule["a"], "b": by_rule["b"], "cells": len(cells)}
+    rep, flips = d279_report(meta, prim, sens, s11, oinfo, ph)
+    S.write_text(out / ("d279_report%s.md" % sfx), rep)
+    by_cell = {"%s|%s" % k: dict(v) for k, v in sorted(cells.items())}
+    S.write_json(out / ("d279_numbers%s.json" % sfx),
+                 {"meta": meta, "overlay": dict(oinfo, by_cell=by_cell),
+                  "cell_strict": {"primary": cs_p, "d279": cs_s}, "primary": prim, "d279": sens,
+                  "summary_change_points": pts, "readings_that_change": flips})
+    versions = {}
+    for mod in ("numpy", "statsmodels", "matplotlib", "yaml", "sacrebleu", "transformers", "torch"):
+        try:
+            versions[mod] = getattr(__import__(mod), "__version__", "?")
+        except Exception:
+            versions[mod] = "not installed"
+    versions["python"] = sys.version.split()[0]
+    d279_files = {k: {"path": str(fpath[k]), "sha256": v} for k, v in fsha.items()}
+    S.write_json(out / "manifest.json", dict(meta, inputs=world.hashes, scored_files=recs.files, d279_files=d279_files,
+                                             primary_numbers_sha256=S.sha256_file(nums_p), versions=versions,
+                                             tables=[tab], seconds=round(time.time() - t0, 1)))
+    S.write_text(out / "checks.txt", checks.text())
+    say("")
+    say("S11 (percentage points [95% CI]; primary -> D279 rules a and b; change; Holm p or p):")
+    for r in s11:
+        say("  %-31s %-34s %-22s -> %-22s %7s  %s" % (r[0], r[1], r[2], r[3], r[4], (
+            "Holm %s -> %s" % (r[7], r[8])) if r[7] else (("p %s -> %s" % (r[5], r[6])) if r[5] else "")))
+    say("readings that change: %s" % ("; ".join(flips) if flips else "none"))
+    n_fail = checks.count("FAIL")
+    say("sens-d279: %d check lines, %d FAIL, %d WARN; S11, report, numbers, manifest and checks in %s (%.0f s)" % (
+        len(checks.rows), n_fail, checks.count("WARN"), out, time.time() - t0))
+    say("sens-d279: %s" % ("DONE%s" % (" (PLACEHOLDER: never results)" if ph else "") if not n_fail else
+                           "%d FAIL after the analysis: read checks.txt before using S11" % n_fail))
+    return 1 if n_fail else 0
+
+
+# --------------------------------------------------------------------------
 # 6. Command line
 # --------------------------------------------------------------------------
 
@@ -1670,10 +2196,21 @@ def main(argv=None):
     p.add_argument("--mode", choices=("placeholder", "real"), required=True)
     p.add_argument("--out", required=True)
     p.add_argument("--boot", type=int, default=S.N_BOOT)
+    p = sub.add_parser("sens-d279", help="D290: the D279 scorer sensitivity pass beside the primary run (S11)")
+    common(p)
+    p.add_argument("--mode", choices=("placeholder", "real"), required=True)
+    p.add_argument("--scored", nargs="+", required=True, help="glob(s) of scored .jsonl files")
+    p.add_argument("--changes", help="default: <drive>/scored/main/sensitivity_D279/changes.csv")
+    p.add_argument("--d279-summary", help="default: summary.json next to changes.csv")
+    p.add_argument("--d279-by-condition", help="default: by_condition.csv next to changes.csv")
+    p.add_argument("--primary-run", required=True, help="the run_<UTC> folder of the primary run")
+    p.add_argument("--deviation", help="real mode: \"D290: <reason>\" (added after the tag gate-E)")
+    p.add_argument("--out", required=True)
+    p.add_argument("--boot", type=int, default=S.N_BOOT)
     args = ap.parse_args(argv)
     fn = {"selftest": cmd_selftest, "check-inputs": cmd_check_inputs, "templates": cmd_templates,
           "tokens": cmd_tokens, "placeholder": cmd_placeholder, "budget-items": cmd_budget_items,
-          "run": cmd_run}[args.cmd]
+          "run": cmd_run, "sens-d279": cmd_sens_d279}[args.cmd]
     try:
         return fn(args)
     except S.StatsError as exc:
