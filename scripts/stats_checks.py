@@ -179,7 +179,8 @@ MODEL_NAMES = {"gemini": "Gemini 3.6 Flash", "qwen": "Qwen3.5-4B", "gemma": "Gem
 CONTRASTS = ("P1", "P2", "P12", "P3", "P4", "P5", "P6", "P7")
 COND_L = ("L-BB", "L-BE", "L-EB", "L-EE", "L-BB0", "L-EE0")
 STAGE_OK = (re.compile(r"\.(png|pdf)$"), re.compile(r"\.(csv|md)$"))
-STAGE_TOP = ("analysis_report.md", "d279_report.md", "manifest.json", "checks.txt")
+STAGE_TOP = ("analysis_report.md", "d279_report.md", "explore_report.md", "manifest.json", "checks.txt")
+D293_VERSION = "explore-p7-d293-2026-10-24"
 
 
 # ---- small tools --------------------------------------------------------------
@@ -383,6 +384,9 @@ def cmd_pins(args):
     sc = main / "scripts" / "stats_checks.py"
     L.add("INFO", "main scripts/stats_checks.py", "sha256 %s..., %s" % (
         sha256_file(sc)[:12] if sc.exists() else "missing", VERSION))
+    ex = main / "scripts" / "explore_p7.py"
+    L.add("INFO", "main scripts/explore_p7.py (D293)", "sha256 %s..." % (sha256_file(ex)[:12] if ex.exists()
+                                                                        else "missing"))
     for dist, want in PACKAGES:
         try:
             v = md.version(dist)
@@ -717,7 +721,7 @@ def verify_d279(folder, primary, main, L):
     meta = dn.get("meta") or {}
     L.check(meta.get("primary_diffs") == [] and (meta.get("primary_compared") or 0) > 0,
             "primary reproduced inside the pass", "%s quantities, differences %d, last digits only %d" % (
-                meta.get("primary_compared"), len(meta.get("primary_diffs") or [1]),
+                meta.get("primary_compared"), len(meta.get("primary_diffs", [None])),
                 len(meta.get("primary_last_digit_diffs") or [])))
     hdr, rows = read_csv(folder / "supplement" / "S11_scorer_sensitivity_D279.csv")
     L.check(len(rows) == E["s11_rows"] and len(hdr) == 11, "S11 table", "%d rows, %d columns (expected %d rows:"
@@ -732,13 +736,35 @@ def verify_d279(folder, primary, main, L):
     return dn
 
 
+def verify_d293(folder, primary, L):
+    man = json.loads((folder / "manifest.json").read_text(encoding="utf-8"))
+    ok = (man.get("script_version") == D293_VERSION and man.get("mode") == "real" and man.get("n_boot") == 10000
+          and man.get("seed") == 42 and (primary is None or man.get("primary_run") == primary.name))
+    L.check(ok, "D293 manifest", "%s; script %s, %s resamples, primary run %s" % (
+        folder.name, man.get("script_version"), man.get("n_boot"), man.get("primary_run")))
+    cl = check_lines(folder / "checks.txt")
+    st = Counter(r[0] for r in cl)
+    rep_ = [r for r in cl if r[1] == "primary P7 reproduced"]
+    L.check(st.get("FAIL", 0) == 0 and st.get("WARN", 0) == 0 and rep_ and rep_[0][0] == "PASS",
+            "checks.txt of the D293 bound", "%d lines: PASS %d, INFO %d, WARN %d, FAIL %d; primary P7 reproduced %s" % (
+                len(cl), st.get("PASS", 0), st.get("INFO", 0), st.get("WARN", 0), st.get("FAIL", 0),
+                rep_[0][0] if rep_ else "missing"))
+    hdr, rows = read_csv(folder / "supplement" / "S3_rows_D293_exploratory.csv")
+    L.check(len(rows) == 3, "D293 rows", "%d rows (one per model)" % len(rows))
+    say("")
+    say("D293 exploratory bound (P7, points; primary -> bound; p and Holm of the bound; English copies yes / no):")
+    for r in rows:
+        say("  %-17s %-22s -> %-22s p %s, Holm %s; copies %s" % (r[0], r[3], r[4], r[5], r[6], r[8]))
+
+
 def cmd_verify(args):
     say("stats_checks verify (%s, UTC %s)" % (VERSION, utc_now()))
     base = Path(args.drive) / "results" / "stats"
     run = resolve(args.run, base, "run_")
     d279 = resolve(args.d279, base, "sens_D279_")
-    if run is None and d279 is None:
-        say("STOP: give --run and/or --d279 (a folder or latest)")
+    d293 = resolve(args.d293, base, "explore_D293_")
+    if run is None and d279 is None and d293 is None:
+        say("STOP: give --run, --d279 and/or --d293 (a folder or latest)")
         return 2
     L = Lines("V")
     parts = {}
@@ -758,6 +784,13 @@ def cmd_verify(args):
             prim_run = run if run is not None else newest(base, "run_")
             verify_d279(d279, prim_run, Path(args.main) if args.main else None, L)
             parts["d279"] = {"folder": d279.name, "fail": sum(1 for r in L.rows[k0:] if r[1] == "FAIL")}
+    if d293 is not None:
+        if not (d293 / "explore_numbers.json").exists():
+            L.check(False, "D293 folder", "%s has no explore_numbers.json" % d293)
+        else:
+            k0 = len(L.rows)
+            verify_d293(d293, run if run is not None else newest(base, "run_"), L)
+            parts["d293"] = {"folder": d293.name, "fail": sum(1 for r in L.rows[k0:] if r[1] == "FAIL")}
     if nums is not None and args.estimates:
         try:
             print_estimates(nums)
@@ -804,7 +837,8 @@ def cmd_stage(args):
     base = Path(args.drive) / "results" / "stats"
     dest_root = Path(args.main) / "results" / "stats"
     n_files, n_bytes, refused = 0, 0, []
-    for part, arg, prefix in (("primary", args.run, "run_"), ("d279", args.d279, "sens_D279_")):
+    for part, arg, prefix in (("primary", args.run, "run_"), ("d279", args.d279, "sens_D279_"),
+                              ("d293", args.d293, "explore_D293_")):
         folder = resolve(arg, base, prefix)
         if folder is None:
             continue
@@ -841,6 +875,7 @@ def main(argv=None):
         else:
             p.add_argument("--run", help="a run_<UTC> folder, or latest")
             p.add_argument("--d279", help="a sens_D279_<UTC> folder, or latest")
+            p.add_argument("--d293", help="an explore_D293_<UTC> folder, or latest")
         if name == "verify":
             p.add_argument("--no-estimates", dest="estimates", action="store_false")
     args = ap.parse_args(argv)
